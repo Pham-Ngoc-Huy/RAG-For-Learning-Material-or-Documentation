@@ -16,3 +16,15 @@ Or use Docker Compose:
     docker compose up --build
 
 Customize the exposed port or command as needed if your app entrypoint changes.
+
+# References:
+## [1] MarkItDown - Repo [Turn file-format to .md file]
+```bash
+https://github.com/microsoft/markitdown
+```
+
+## [2] Qdrant: Vector Database - Repo [store and embedded the data]
+
+```bash
+https://github.com/qdrant/qdrant
+```
