@@ -1,1 +1,4 @@
 markitdown[all]
+openai
+sentence-transformers
+numpy

@@ -12,9 +12,10 @@ RUN apt-get update && apt-get install -y \
     
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+RUN pip install --no-cache-dir uv
 
 COPY requirements.txt ./
-RUN if [ -s requirements.txt ]; then pip install --no-cache-dir -r requirements.txt; fi
+RUN if [ -s requirements.txt ]; then uv pip install --system --no-cache-dir -r requirements.txt; fi
 
 COPY . .
 

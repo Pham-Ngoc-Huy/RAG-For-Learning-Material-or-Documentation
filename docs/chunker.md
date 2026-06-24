@@ -100,3 +100,17 @@ chunk 4: "## Black Holes\nBlack holes warp spacetime significantly."
 
 **Note:**
 >Without overlap, if a sentence spans a chunk boundary it gets cut and loses context. Overlap ensures boundary content appears in both adjacent chunks so nothing is lost.
+
+## 3. Chunker
+>**Result return:** the result of `chunker.py` will return 
+```python
+[
+        {
+        "text": c,
+        "metadata": self._build_chunk_metadata(metadata, i, len(chunks))
+        }
+        for i, c in enumerate(chunks)
+]
+
+```
+

@@ -103,7 +103,7 @@ class RecursiveChunker(BaseChunker):
             if len(piece) <= self.chunk_size:
                 result.append(piece)
             else:
-                result.append(self._split(piece, sep_index + 1))
+                result.extend(self._split(piece, sep_index + 1))
 
         return [p.strip() for p in result if p.strip()]
     def _merge(
@@ -124,7 +124,7 @@ class RecursiveChunker(BaseChunker):
                 if current:
                     chunks.append(piece)
 
-                overlap_text = curent[-self.chunk_overlap] if current else ""
+                overlap_text = current[-self.chunk_overlap] if current else ""
                 current = (overlap_text + " " + piece).strip()
         if current:
             chunks.append(current)
