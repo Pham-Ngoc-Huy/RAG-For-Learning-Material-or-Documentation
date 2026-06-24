@@ -10,7 +10,9 @@ SUPPORT_EXTENSIONS = {
     ".jpg", ".jpeg", ".png"
 }
 # objective: init once at module level
-mid = MarkItDown()
+mid = MarkItDown(
+    cu_endpoint="<content_understanding_endpoint"
+)
 class BaseLoader(ABC):
     """
     All loader must implement load()
@@ -55,6 +57,10 @@ class FileLoader(BaseLoader):
 
             if not text:
                 return None
+
+            with open(f"md_store/{self.file_path.stem}.md", "w", encoding="utf-8") as f:
+                print(f"Writing: {self.file_path.stem} as markdown format")
+                f.write(result.markdown)
 
             return {
                 "text":text,
