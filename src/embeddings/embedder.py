@@ -111,4 +111,53 @@ class OpenAIEmbedder(BaseEmbedder):
             model=self.model_name
         )
         return [item.embedding for item in response.data]
-    
+
+class DeepSeeekEmbedder(BaseEmbedder):
+    """
+    Embedder backed by an OpenAI-compatible endpoint (e.g. opencode.ai/zen).
+
+    The zen proxy exposes /v1/embeddings alongside /v1/chat/completions, so
+    we strip the trailing path from the URL you were given and let the openai
+    client handle routing.
+
+    If the proxy does NOT support /v1/embeddings you'll get a 404 and should
+    fall back to SentenceTransformerEmbedder for embeddings and reserve
+    DeepSeek for generation only.
+
+    Dimensions: deepseek-v4-flash does not publish a fixed embedding size, so
+    we discover it lazily on the first call and cache it.
+    """
+    BASE_URL= "https://opencode.ai/zen/v1"
+    DEFAULT_MODEL = "deepseek-v4-flash-free"
+
+    def __init__(
+        self,
+        model_name:str = DEFAULT_MODEL,
+        base_url:str = BASE_URL,
+        api_key:Optional[str] = None,
+    ):
+        resolved_key = api_key or os.environ.get("DEEPSEEK_API_KEY", "placeholder")
+        self.client = openai.OpenAI(api_key=resolved_key, base_url=base_url)
+        self.model_name = model_name
+        self._dimensions: Optional[int] = None  # discovered on first embed
+
+    @property
+    def dimension(self) -> Optional[int]:
+        return self._dimensions
+
+    def embed_one(
+        self,
+        text:str
+    ) -> list[float]:
+        response = self.client.embeddings.create(nput=text, model=self.model_name)
+        vector = response.data[0].embedding
+        if self._dimensions is None:
+            self._dimensions = len(vector)
+        return vector
+
+    def _batch_embed(self, texts: list[str]) -> list[list[float]]:
+        response = self.client.embeddings.create(input=texts, model=self.model_name)
+        vectors = [item.embedding for item in response.data]
+        if self._dimensions is None and vectors:
+            self._dimensions = len(vectors[0])
+        return vectors
