@@ -149,7 +149,7 @@ class DeepSeeekEmbedder(BaseEmbedder):
         self,
         text:str
     ) -> list[float]:
-        response = self.client.embeddings.create(nput=text, model=self.model_name)
+        response = self.client.embeddings.create(input=text, model=self.model_name)
         vector = response.data[0].embedding
         if self._dimensions is None:
             self._dimensions = len(vector)

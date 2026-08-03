@@ -122,9 +122,9 @@ class RecursiveChunker(BaseChunker):
                 current = (current + " " + piece).strip()
             else:
                 if current:
-                    chunks.append(piece)
+                    chunks.append(current)
 
-                overlap_text = current[-self.chunk_overlap] if current else ""
+                overlap_text = current[-self.chunk_overlap:] if current else ""
                 current = (overlap_text + " " + piece).strip()
         if current:
             chunks.append(current)
@@ -168,7 +168,7 @@ class MarkDownChunker(BaseChunker):
             if preamble:
                 sections.append(("", preamble))
 
-        for i, match in enumerate(sections):
+        for i, match in enumerate(matches):
             title = match.group(2).strip()
             body_start = match.end()
             body_end = matches[i+1].start() if i+1 < len(matches) else len(text)
