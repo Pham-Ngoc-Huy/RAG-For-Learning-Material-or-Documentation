@@ -2,3 +2,4 @@ markitdown[all]
 openai
 sentence-transformers
 numpy
+qdrant-client
