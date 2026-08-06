@@ -3,6 +3,7 @@ from pathlib import Path
 from datetime import datetime
 from typing import Optional
 from abc import ABC, abstractmethod
+import pdf_inspector
 
 SUPPORT_EXTENSIONS = {
     ".pdf", ".docx", ".pptx", ".xlsx",
@@ -52,11 +53,15 @@ class FileLoader(BaseLoader):
             raise ValueError(f"Unsupported type: {self.file_path.suffix.lower()}") 
 
         try:
-            result = mid.convert(str(self.file_path))
-            text = result.text_content.strip()
+            if self.file_path.suffix.lower() == ".pdf":
+                result = pdf_inspector.process_pdf(str(self.file_path))
+                text = result.markdown
+            else:
+                result = mid.convert(str(self.file_path))
+                text = result.text_content.strip()
 
             if not text:
-                return None
+                return None 
 
             with open(f"md_store/{self.file_path.stem}.md", "w", encoding="utf-8") as f:
                 print(f"Writing: {self.file_path.stem} as markdown format")

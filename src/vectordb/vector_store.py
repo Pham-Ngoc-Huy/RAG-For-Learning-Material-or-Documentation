@@ -129,12 +129,12 @@ class QdrantVectorStore(BaseVectorStore):
         @param url: optional full Qdrant URL, overrides host/port
         @param prefer_grpc: whether to use the Qdrant gRPC transport
         @objective Create a tenant-aware vector store connection.
-        @update date 2026-08-03
+        @update date 2026-08-05
         @commented by Huy Pham
         """
-        target_url = url or os.getenv("QDRANT_URL") or f"http://{host}:{port}"
-        resolved_api_key = api_key or os.getenv("QDRANT_API_KEY")
-        self.client = QdrantClient(url=target_url, api_key=resolved_api_key, prefer_grpc=prefer_grpc)
+        env_url = os.getenv("QDRANT_ENDPOINT")
+        resolved_api_key = os.getenv("QDRANT_API_KEY")
+        self.client = QdrantClient(url=env_url, api_key=resolved_api_key, prefer_grpc=prefer_grpc)
 
     def _collection_name(self, user_id: str, collection_name: Optional[str] = None) -> str:
         """
@@ -192,6 +192,16 @@ class QdrantVectorStore(BaseVectorStore):
         distance: Distance = Distance.COSINE,
         collection_name: Optional[str] = None,
     ) -> str:
+        """
+        @brief Create a tenant-scoped vector collection if it does not exist.
+        @param user_id: tenant identifier for multi-tenant isolation
+        @param vector_size: size of each vector in the collection
+        @param distance: qdrant distance metric for similarity search
+        @param collection_name: optional custom collection suffix
+        @objective Ensure each tenant has an isolated collection in Qdrant.
+        @update date 2026-08-03
+        @commented by Huy Pham
+        """
         collection = self._collection_name(user_id, collection_name)
         vectors_config = VectorParams(size=vector_size, distance=distance)
         try:
@@ -199,6 +209,15 @@ class QdrantVectorStore(BaseVectorStore):
             return collection
         except Exception:
             self.client.create_collection(collection_name=collection, vectors_config=vectors_config)
+            # Create payload index for user_id filtering
+            try:
+                self.client.create_payload_index(
+                    collection_name=collection,
+                    field_name="user_id",
+                    field_schema="keyword",
+                )
+            except Exception:
+                pass  # Index might already exist
             return collection
 
     def upsert(
@@ -248,9 +267,9 @@ class QdrantVectorStore(BaseVectorStore):
         collection = self._collection_name(user_id, collection_name)
         query_filter = self._build_user_filter(user_id=user_id, metadata_filter=metadata_filter)
 
-        results = self.client.search(
+        results = self.client.query_points(
             collection_name=collection,
-            query_vector=query_vector,
+            query=query_vector,
             limit=top_k,
             query_filter=query_filter,
             with_payload=with_payload,
@@ -262,7 +281,7 @@ class QdrantVectorStore(BaseVectorStore):
                 "score": getattr(hit, "score", None),
                 "payload": getattr(hit, "payload", None),
             }
-            for hit in results
+            for hit in results.points
         ]
 
     def delete_user_data(

@@ -1,5 +1,6 @@
 markitdown[all]
 openai
+requests
 sentence-transformers
 numpy
 qdrant-client
