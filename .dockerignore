@@ -9,3 +9,6 @@ __pycache__/
 .gitignore
 logs/
 .env
+.venv/
+temp/
+md_store/

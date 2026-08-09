@@ -4,3 +4,7 @@ requests
 sentence-transformers
 numpy
 qdrant-client
+pdf-inspector
+fastapi
+uvicorn[standard]
+python-multipart

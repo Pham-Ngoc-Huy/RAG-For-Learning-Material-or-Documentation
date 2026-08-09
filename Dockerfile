@@ -20,4 +20,4 @@ RUN if [ -s requirements.txt ]; then uv pip install --system --no-cache-dir -r r
 
 COPY . .
 
-CMD ["python3", "main.py"]
+CMD ["python3", "-m", "uvicorn", "src.api.app:app", "--host", "0.0.0.0", "--port", "8000"]

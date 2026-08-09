@@ -257,7 +257,8 @@ class LocalLLMClient(BaseLLMClient):
 
     def generate(
         self,
-        prompt: str,
+        prompt: str = "",
+        messages: Optional[list[dict]] = None,
         max_tokens: int = 500,
         temperature: float = 0.7,
     ) -> dict:
@@ -265,10 +266,14 @@ class LocalLLMClient(BaseLLMClient):
 
         @brief Generate a stub response based on the prompt.
         @param prompt: the prompt text (used to generate mock response)
+        @param messages: optional chat message history (last message content is used)
         @param max_tokens: max tokens (for mock calculation)
         @param temperature: temperature (ignored in mock)
         @return: mock response dict
         """
+        if not prompt and messages:
+            prompt = messages[-1].get("content", "")
+
         # Simple mock: count questions in prompt and respond accordingly
         question_mark_count = prompt.count("?")
         if question_mark_count > 0:

@@ -1,0 +1,1793 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Farvis — UI Concept (FINBI_HC_New theme)</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --page:#F4F6FA;
+    --surface:#FFFFFF;
+    --line:#E8EEFA;
+    --line-strong:#D9E0F2;
+    --ink:#262626;
+    --muted:#8F8F8F;
+    --muted-2:#B7B7B7;
+
+    --brand:#D50000;
+    --brand-mid:#E16A7A;
+    --brand-pale:#E9B4B4;
+    --brand-vivid:#F0123A;
+    --brand-soft-bg:#FBE9E9;
+    --radius:10px;
+    --shadow:1px 1px 6px rgba(213,0,0,0.10);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--page);
+    color:var(--ink);
+    font-family:'Tahoma','Segoe UI',Verdana,sans-serif;
+    font-size:13.5px;
+    line-height:1.55;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .r-hidden{display:none !important;}
+
+  #screen-login{
+    min-height:100vh;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(160deg,#F4F6FA 0%,#FBE9E9 120%);padding:24px;
+  }
+  .login-wrap{width:100%;max-width:940px;display:grid;grid-template-columns:1fr 1fr;
+    border-radius:14px;overflow:hidden;box-shadow:0 6px 28px rgba(213,0,0,0.12);background:var(--surface);}
+  .login-side{background:var(--brand);color:#fff;padding:40px 34px;display:flex;flex-direction:column;justify-content:space-between;}
+  .login-side .brand-big{display:flex;align-items:center;gap:9px;}
+  .login-side .brand-big .mark{width:12px;height:12px;border-radius:3px;background:#fff;}
+  .login-side .brand-big .word{font-size:26px;font-weight:700;}
+  .login-side .tag{font-family:'IBM Plex Mono',monospace;font-size:10px;background:rgba(255,255,255,0.18);padding:2px 7px;border-radius:4px;margin-left:2px;}
+  .login-side .pitch{font-size:13px;line-height:1.7;color:#FBDADA;margin-top:22px;}
+  .login-side .foot{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#FBC3C3;}
+
+  .login-form{padding:40px 36px;}
+  .login-form h2{font-size:19px;margin:0 0 4px;}
+  .login-form .sub{font-size:12px;color:var(--muted);margin-bottom:22px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:11px;color:var(--muted);margin-bottom:5px;font-weight:700;}
+  .field input, .field select{
+    width:100%;border:1px solid var(--line-strong);border-radius:8px;padding:9px 11px;
+    font-family:inherit;font-size:13px;color:var(--ink);background:var(--surface);
+  }
+  .field input:focus, .field select:focus{outline:2px solid var(--brand-pale);border-color:var(--brand);}
+  .btn-login{width:100%;background:var(--brand);color:#fff;border:none;padding:11px;border-radius:8px;
+    font-size:13.5px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:6px;}
+  .login-links{display:flex;justify-content:flex-end;margin:-6px 0 14px;}
+  .login-links a{font-size:11.5px;color:var(--brand);text-decoration:none;font-weight:700;cursor:pointer;}
+  .login-links a:hover{text-decoration:underline;}
+  .change-pw-panel{
+    background:var(--page);border:1px solid var(--line);border-radius:10px;
+    padding:16px;margin-top:16px;
+  }
+  .change-pw-panel .hint{font-size:10.5px;color:var(--muted);margin-top:8px;}
+
+  .pw-modal-overlay{
+    position:fixed;inset:0;background:rgba(20,20,20,0.45);z-index:100;
+    display:flex;align-items:center;justify-content:center;padding:20px;
+  }
+  .pw-modal{background:var(--surface);border-radius:12px;width:100%;max-width:380px;padding:20px 22px;box-shadow:0 10px 40px rgba(0,0,0,0.25);}
+  .pw-modal-head{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:15px;border-bottom:1px solid var(--line);padding-bottom:12px;}
+  .pw-modal-close{background:none;border:none;font-size:15px;color:var(--muted);cursor:pointer;}
+
+  .divider{display:flex;align-items:center;gap:10px;margin:22px 0 14px;font-size:10.5px;color:var(--muted-2);}
+  .divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--line);}
+
+  .demo-roles{display:grid;grid-template-columns:1fr;gap:8px;}
+  .demo-role-btn{
+    display:flex;justify-content:space-between;align-items:center;
+    text-align:left;border:1px solid var(--line);background:var(--page);border-radius:8px;
+    padding:10px 12px;cursor:pointer;font-family:inherit;
+  }
+  .demo-role-btn:hover{border-color:var(--brand);background:var(--brand-soft-bg);}
+  .demo-role-btn .r-name{font-size:12.5px;font-weight:700;color:var(--ink);}
+  .demo-role-btn .r-role{font-size:10.5px;color:var(--brand);font-family:'IBM Plex Mono',monospace;}
+  .demo-role-btn .r-title{font-size:10.5px;color:var(--muted);}
+
+  .app{display:grid;grid-template-columns:236px 1fr;min-height:100vh;}
+
+  .sidebar{
+    background:var(--surface);
+    border-right:1px solid var(--line);
+    padding:20px 14px;
+    display:flex;flex-direction:column;gap:26px;
+  }
+  .brand{display:flex;align-items:baseline;gap:7px;padding:0 6px;}
+  .brand .mark{width:10px;height:10px;border-radius:3px;background:var(--brand);display:inline-block;}
+  .brand .word{font-size:20px;font-weight:700;letter-spacing:0.2px;color:var(--ink);}
+  .brand .tag{
+    font-family:'IBM Plex Mono',monospace;font-size:10px;color:#fff;
+    background:var(--brand);border-radius:4px;padding:2px 6px;margin-left:2px;
+  }
+  nav{display:flex;flex-direction:column;gap:2px;}
+  .nav-label{
+    font-size:10px;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--muted-2);padding:12px 10px 4px;font-weight:700;
+  }
+  .nav-item{
+    display:flex;align-items:center;gap:10px;padding:9px 10px;
+    border-radius:8px;color:#4a4a4a;font-size:13px;cursor:pointer;
+    border-left:3px solid transparent;
+  }
+  .nav-item svg{width:15px;height:15px;flex-shrink:0;opacity:.75;}
+  .nav-item:hover{background:var(--brand-soft-bg);}
+  .nav-item.active{
+    background:var(--brand-soft-bg);
+    color:var(--brand);font-weight:700;
+    border-left:3px solid var(--brand);
+  }
+  .nav-item.active svg{opacity:1;stroke:var(--brand);}
+  .nav-label-text{flex:1;}
+  .sidebar-foot{
+    margin-top:auto;border-top:1px solid var(--line);padding-top:12px;
+    font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);line-height:1.7;
+  }
+  .logout-btn{
+    display:flex;align-items:center;gap:6px;margin-top:8px;background:none;border:none;
+    color:var(--brand);font-family:inherit;font-size:11.5px;font-weight:700;cursor:pointer;padding:0;
+  }
+
+  .main{display:flex;flex-direction:column;min-height:100vh;}
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 28px;border-bottom:1px solid var(--line);background:var(--surface);
+  }
+  .view-title{font-size:19px;font-weight:700;color:var(--ink);}
+  .view-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+  .topbar-right{display:flex;align-items:center;gap:10px;}
+
+  .lang-switch{display:flex;border:1px solid var(--line);border-radius:20px;padding:2px;background:var(--page);}
+  .lang-btn{border:none;background:transparent;font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:700;
+    padding:5px 11px;border-radius:16px;cursor:pointer;color:var(--muted);}
+  .lang-btn.active{background:var(--brand);color:#fff;}
+
+  .quota-track{
+    display:flex;flex-direction:column;gap:4px;
+    background:var(--page);border:1px solid var(--line);border-radius:14px;
+    padding:6px 14px;min-width:168px;
+  }
+  .quota-track .row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;}
+  .quota-track .lbl{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+  .quota-track .num{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink);}
+  .quota-track .num b{color:var(--brand);font-size:12.5px;}
+  .quota-bar{width:100%;height:5px;border-radius:4px;background:#E9EAF3;overflow:hidden;}
+  .quota-bar-fill{height:100%;border-radius:4px;background:var(--brand-mid);transition:width .2s;}
+  .quota-bar-fill.high{background:var(--brand-vivid);}
+
+  .role-chip{display:flex;align-items:center;gap:8px;background:var(--page);border:1px solid var(--line);border-radius:20px;padding:4px 12px 4px 4px;}
+  .avatar{width:24px;height:24px;border-radius:6px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;}
+  .role-chip .name{font-size:12px;font-weight:700;}
+  .role-chip .role{font-size:10.5px;color:var(--muted);}
+
+  .disclaimer-bar{
+    display:flex;align-items:center;gap:8px;
+    background:var(--brand-soft-bg);border-bottom:1px solid var(--brand-pale);
+    padding:8px 28px;font-size:11.5px;color:#7A1414;
+  }
+  .disclaimer-bar .ic{flex-shrink:0;font-size:13px;}
+  .disclaimer-bar b{color:var(--brand-vivid);}
+
+  .app-footer{
+    border-top:1px solid var(--line);background:var(--surface);
+    padding:12px 28px;display:flex;justify-content:space-between;align-items:center;
+    flex-wrap:wrap;gap:6px;
+  }
+  .app-footer .left{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);}
+  .app-footer .left .dot{width:7px;height:7px;border-radius:2px;background:var(--brand);display:inline-block;}
+  .app-footer .right{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted-2);}
+
+  .content{flex:1;padding:26px 28px 40px;overflow-y:auto;}
+  .view{display:none;}
+  .view.active{display:block;}
+
+  .card-titled{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+  .card-titled .bar{
+    background:var(--brand);color:#fff;padding:9px 16px;
+    display:flex;justify-content:space-between;align-items:baseline;
+  }
+  .card-titled .bar .t{font-size:15px;font-weight:700;}
+  .card-titled .bar .s{font-size:10px;color:#FBDADA;}
+  .card-titled .body{padding:14px 16px;}
+
+  .chat-layout{display:grid;grid-template-columns:1fr 260px;gap:22px;align-items:start;}
+  .thread{display:flex;flex-direction:column;gap:16px;}
+
+  .q-bubble{align-self:flex-end;max-width:78%;background:var(--ink);color:#fff;padding:10px 15px;border-radius:12px 12px 3px 12px;font-size:13px;}
+
+  .a-card{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    border-top:3px solid var(--brand);box-shadow:var(--shadow);
+    padding:15px 17px;max-width:88%;
+  }
+  .a-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--brand);margin-bottom:8px;}
+  .a-card p{margin:0 0 9px;font-size:13.2px;}
+  .a-card p:last-of-type{margin-bottom:0;}
+  .cite-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px;}
+  .cite{
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;border:1px solid var(--line);
+    background:var(--page);color:var(--muted);padding:4px 8px;border-radius:6px;
+    display:inline-flex;align-items:center;gap:5px;
+  }
+  .cite .dot{width:5px;height:5px;border-radius:50%;background:var(--brand);}
+  .cache-flag{display:flex;align-items:center;justify-content:space-between;margin-top:11px;padding-top:11px;border-top:1px dashed var(--line);font-size:11px;color:var(--muted);}
+  .cache-flag a{color:var(--brand);text-decoration:none;font-weight:700;}
+  .token-flag{
+    display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+    margin-top:11px;padding-top:11px;border-top:1px dashed var(--line);
+    font-size:10.5px;color:var(--muted);
+  }
+  .token-flag .token-sep{color:var(--line-strong);}
+  .token-flag .token-diff-ok{color:#1F7A44;}
+  .token-flag .token-diff-over{color:var(--brand-vivid);}
+
+  .deny-card{
+    background:var(--brand-soft-bg);border:1px solid var(--brand-pale);border-left:4px solid var(--brand-vivid);
+    border-radius:var(--radius);padding:13px 17px;max-width:88%;font-size:13px;color:#6E1414;
+  }
+  .deny-card .lbl{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--brand-vivid);margin-bottom:6px;display:block;font-weight:700;}
+
+  .composer{margin-top:20px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:12px 14px;}
+  .composer input{width:100%;border:none;outline:none;background:transparent;font-family:inherit;font-size:13.3px;color:var(--ink);}
+  .composer-foot{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);}
+  .composer-hint{font-size:10.5px;color:var(--muted);}
+  .send-btn{background:var(--brand);color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;}
+
+  .side-panel{display:flex;flex-direction:column;gap:14px;}
+  .related-q{font-size:12px;padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer;color:var(--ink);}
+  .related-q:last-child{border-bottom:none;}
+  .related-q:hover{color:var(--brand);}
+  .stat-row{display:flex;justify-content:space-between;font-size:11.5px;padding:6px 0;color:var(--muted);}
+  .stat-row b{color:var(--ink);font-weight:700;}
+
+  .kb-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+  .chip-row{display:flex;gap:8px;flex-wrap:wrap;}
+  .filter-chip{font-size:11px;padding:5px 12px;border-radius:20px;border:1px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer;}
+  .filter-chip.on{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:700;}
+  .btn-primary{background:var(--brand);color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:11.5px;font-family:inherit;font-weight:700;cursor:pointer;}
+  .btn-ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line);padding:8px 16px;border-radius:8px;font-size:11.5px;font-family:inherit;font-weight:700;cursor:pointer;}
+
+  .kb-table{width:100%;border-collapse:collapse;}
+  .kb-table th{text-align:left;font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:10px 16px;border-bottom:1px solid var(--line);background:var(--page);}
+  .kb-table td{padding:11px 16px;border-bottom:1px solid var(--line);font-size:12.5px;vertical-align:middle;}
+  .kb-table tr:last-child td{border-bottom:none;}
+  .doc-name{font-weight:700;}
+  .doc-meta{font-size:11px;color:var(--muted);margin-top:2px;}
+  .tag-pill{font-family:'IBM Plex Mono',monospace;font-size:10px;padding:2px 8px;border-radius:5px;display:inline-block;font-weight:500;}
+  .tag-published{background:var(--brand-soft-bg);color:var(--brand);}
+  .tag-pending{background:#F0F0F0;color:var(--muted);}
+  .sens-1{color:var(--muted-2);font-weight:700;}
+  .sens-2{color:var(--brand-mid);font-weight:700;}
+  .sens-3{color:var(--brand-vivid);font-weight:700;}
+
+  .approval-card{margin-bottom:14px;}
+  .approval-head{display:flex;justify-content:space-between;align-items:flex-start;padding:14px 17px 0;}
+  .approval-meta{font-size:11px;color:var(--muted);margin-top:4px;}
+  .vote-score{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted);white-space:nowrap;}
+  .approval-labels{display:flex;gap:6px;margin:12px 17px 0;flex-wrap:wrap;}
+  .approval-actions{display:flex;gap:8px;margin:14px 17px 0;}
+  .btn-approve{background:var(--brand);color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit;}
+  .btn-reject{background:transparent;color:var(--muted);border:1px solid var(--line-strong);padding:8px 16px;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit;}
+  .btn-vote{background:var(--surface);color:var(--ink);border:1px solid var(--line-strong);padding:8px 14px;border-radius:8px;font-size:12.5px;cursor:pointer;font-family:inherit;}
+  .approver-note{font-size:11px;color:var(--muted);margin:14px 17px 15px;padding-top:12px;border-top:1px dashed var(--line);}
+
+  .pin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
+  .pin-domain{font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#FBDADA;letter-spacing:.05em;}
+  .pin-q{font-weight:700;font-size:13px;}
+  .pin-snippet{font-size:12px;color:var(--ink);margin-bottom:10px;}
+  .pin-foot{font-size:10.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:9px;}
+
+  .users-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+  .add-user-form{
+    background:var(--surface);border:1px solid var(--brand-pale);border-radius:var(--radius);
+    padding:16px 18px;margin-bottom:16px;box-shadow:var(--shadow);
+  }
+  .add-user-form .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;}
+  .add-user-form .hint{font-size:11px;color:var(--muted);margin-top:10px;}
+  .parent-chip{
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--muted);
+    display:inline-flex;align-items:center;gap:5px;
+  }
+  .parent-chip .arrow{color:var(--brand);}
+  .parent-none{color:var(--muted-2);font-style:italic;}
+  .role-badge{font-family:'IBM Plex Mono',monospace;font-size:10px;padding:2px 8px;border-radius:5px;font-weight:700;}
+  .role-Analyst{background:#F0F0F0;color:var(--muted);}
+  .role-Senior{background:#FDE1E7;color:var(--brand-mid);}
+  .role-Lead{background:var(--brand-soft-bg);color:var(--brand);}
+  .btn-preview{background:var(--surface);color:var(--brand);border:1px solid var(--brand-pale);padding:8px 14px;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;}
+  .approval-progress{display:flex;gap:8px;margin:12px 17px 0;}
+  .progress-step{flex:1;background:var(--page);border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:10.5px;}
+  .progress-step.done{background:var(--brand-soft-bg);border-color:var(--brand-pale);}
+  .progress-step .num{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;}
+  .progress-step.done .num{color:var(--brand);}
+  .progress-step .who{font-weight:700;margin-top:2px;}
+
+  .module-switch{display:flex;gap:4px;background:var(--page);border:1px solid var(--line);border-radius:10px;padding:3px;}
+  .module-btn{flex:1;border:none;background:transparent;padding:7px 6px;border-radius:7px;font-family:inherit;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;}
+  .module-btn.active{background:var(--brand);color:#fff;}
+
+  .log-form textarea, .log-form select, .log-form input{
+    width:100%;border:1px solid var(--line-strong);border-radius:8px;padding:9px 11px;
+    font-family:inherit;font-size:13px;color:var(--ink);background:var(--surface);
+  }
+  .log-form textarea{resize:vertical;min-height:64px;}
+  .topic-hint{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;}
+  .topic-hint .cite{background:var(--page);}
+  .topic-search{position:relative;}
+  .topic-dropdown{
+    position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:30;
+    background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.10);max-height:230px;overflow-y:auto;display:none;
+  }
+  .topic-dropdown.open{display:block;}
+  .topic-option{padding:9px 12px;cursor:pointer;border-bottom:1px solid var(--line);}
+  .topic-option:last-child{border-bottom:none;}
+  .topic-option:hover, .topic-option.hl{background:var(--brand-soft-bg);}
+  .topic-option .opt-name{font-weight:700;font-size:12.5px;}
+  .topic-option .opt-ctx{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;}
+  .opt-tag{
+    font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:2px 7px;border-radius:5px;
+    background:var(--page);color:var(--muted);border:1px solid var(--line);
+  }
+  .opt-tag b{color:var(--brand);font-weight:700;}
+  .topic-empty{padding:12px;font-size:12px;color:var(--muted);text-align:center;}
+  .log-type-row{display:flex;gap:8px;margin:12px 0;}
+  .type-chip{flex:1;text-align:center;padding:9px;border-radius:8px;border:1px solid var(--line-strong);font-size:12px;cursor:pointer;}
+  .type-chip.on{background:var(--brand);color:#fff;border-color:var(--brand);}
+  .log-entry{border-bottom:1px solid var(--line);padding:10px 0;font-size:12.5px;}
+  .log-entry:last-child{border-bottom:none;}
+  .log-entry .meta{font-size:10.5px;color:var(--muted);margin-bottom:3px;}
+  .entry-badge{font-family:'IBM Plex Mono',monospace;font-size:9px;padding:1px 6px;border-radius:4px;margin-right:6px;}
+  .badge-progress{background:var(--brand-soft-bg);color:var(--brand);}
+  .badge-blocker{background:#FDE1E7;color:var(--brand-vivid);}
+  .badge-note{background:#F0F0F0;color:var(--muted);}
+
+  .goal-card{border-bottom:1px solid var(--line);padding:14px 0;}
+  .goal-card:last-child{border-bottom:none;}
+  .goal-card .topic-name{font-weight:700;font-size:13px;margin-bottom:2px;}
+  .goal-card .topic-ctx{font-size:11px;color:var(--muted);margin-bottom:8px;}
+
+  .filter-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+  .workload-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line-soft, var(--line));}
+  .workload-row:last-child{border-bottom:none;}
+  .workload-name{width:190px;flex-shrink:0;font-size:12.5px;font-weight:600;}
+  .workload-bar-track{flex:1;height:9px;background:#EFEFEF;border-radius:5px;overflow:hidden;}
+  .workload-bar-fill{height:100%;background:var(--brand);border-radius:5px;}
+  .workload-count{width:70px;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);flex-shrink:0;}
+
+  .report-section{margin-bottom:16px;}
+  .report-section h4{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--brand);margin:0 0 8px;font-family:'IBM Plex Mono',monospace;}
+  .report-section ul{margin:0;padding-left:18px;font-size:13px;line-height:1.7;}
+  .report-topic-tag{font-weight:700;}
+
+  .md-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+  .md-tabs{display:flex;gap:8px;}
+  .md-tab{padding:6px 14px;border-radius:20px;border:1px solid var(--line);background:var(--surface);font-size:11.5px;cursor:pointer;color:var(--muted);}
+  .md-tab.on{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:700;}
+
+  .log-entry .hr{float:right;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--muted);}
+
+  .hour-summary{padding:14px 16px;border-bottom:1px solid var(--line);}
+  .hour-summary .row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;}
+  .hour-summary .label{font-size:11px;color:var(--muted);}
+  .hour-summary .value{font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;}
+  .hour-bar-track{width:100%;height:8px;border-radius:5px;background:#EFEFEF;overflow:hidden;}
+  .hour-bar-fill{height:100%;border-radius:5px;transition:width .2s;}
+  .hour-tag{font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:2px 8px;border-radius:10px;font-weight:700;text-transform:uppercase;}
+  .hour-under{color:#8A6200;} .hour-under .hour-bar-fill{background:#E0A700;} .hour-under.hour-tag{background:#FBF0D6;color:#8A6200;}
+  .hour-over{color:var(--brand-vivid);} .hour-over .hour-bar-fill{background:var(--brand-vivid);} .hour-over.hour-tag{background:#FDE1E7;color:var(--brand-vivid);}
+  .hour-ok{color:#1F7A44;} .hour-ok .hour-bar-fill{background:#2E9E5B;} .hour-ok.hour-tag{background:#DFF3E7;color:#1F7A44;}
+
+  .log-form .hour-input-row{display:flex;gap:10px;}
+  .log-form .hour-input-row .field{flex:1;}
+
+  .week-select{
+    font-family:inherit;font-size:11.5px;font-weight:700;color:#fff;background:rgba(255,255,255,0.16);
+    border:1px solid rgba(255,255,255,0.35);border-radius:6px;padding:5px 9px;cursor:pointer;
+  }
+  .week-select option{color:var(--ink);}
+
+  .add-goal-form{background:var(--page);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;}
+  .add-goal-form .hint{font-size:11px;color:var(--muted);margin-top:10px;}
+  .topic-checklist{display:flex;flex-direction:column;gap:6px;background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;padding:8px 10px;}
+  .topic-check-item{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:3px 0;}
+  .topic-check-item input{width:auto;}
+
+  .goal-project-group{margin-bottom:18px;}
+  .goal-project-group:last-child{margin-bottom:0;}
+  .goal-project-title{
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;
+    color:var(--brand);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--brand-pale);
+  }
+  .goal-topics{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;}
+  .goal-text-display{font-size:12.5px;color:var(--ink);}
+  .goal-empty-week{font-size:12.5px;color:var(--muted);font-style:italic;padding:6px 0;}
+
+  .add-doc-form{
+    background:var(--page);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px 18px;margin-bottom:16px;
+  }
+  .doc-method-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .doc-method-card{
+    background:var(--surface);border:1px solid var(--line-strong);border-radius:10px;
+    padding:16px 14px;cursor:pointer;text-align:center;transition:border-color .12s ease;
+  }
+  .doc-method-card:hover{border-color:var(--brand);background:var(--brand-soft-bg);}
+  .doc-method-card.selected{border-color:var(--brand);background:var(--brand-soft-bg);box-shadow:0 0 0 1px var(--brand);}
+  .doc-method-card .dm-icon{font-size:22px;margin-bottom:6px;}
+  .doc-method-card .dm-title{font-weight:700;font-size:13px;margin-bottom:4px;}
+  .doc-method-card .dm-sub{font-size:10.5px;color:var(--muted);line-height:1.5;}
+  .doc-step{margin-top:16px;}
+  .doc-meta-fields{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:14px 0;}
+
+  .duplicate-note{
+    background:var(--brand-soft-bg);border:1px dashed var(--brand-pale);border-radius:8px;
+    padding:10px 14px;font-size:11px;color:#7A1414;margin-bottom:14px;
+  }
+
+  ::-webkit-scrollbar{width:10px;}
+  ::-webkit-scrollbar-thumb{background:var(--muted-2);border-radius:10px;}
+
+  @media (max-width:820px){
+    .app{grid-template-columns:1fr;}
+    .sidebar{flex-direction:row;align-items:center;overflow-x:auto;padding:12px 14px;gap:14px;}
+    nav{flex-direction:row;}
+    .nav-label{display:none;}
+    .sidebar-foot{display:none;}
+    .chat-layout{grid-template-columns:1fr;}
+    .content{padding:18px;}
+    .login-wrap{grid-template-columns:1fr;}
+    .login-side{display:none;}
+    .add-user-form .grid2{grid-template-columns:1fr;}
+    .doc-method-row{grid-template-columns:1fr;}
+    .doc-meta-fields{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN SCREEN ============ -->
+<div id="screen-login">
+  <div class="login-wrap">
+    <div class="login-side">
+      <div>
+        <div class="brand-big">
+          <span class="mark"></span>
+          <span class="word">Farvis</span>
+          <span class="tag">FINBI</span>
+        </div>
+        <div class="pitch">AI Agent tra cứu Treasury · Risk · Fin · EXCO — trả lời kèm trích dẫn nguồn, phân quyền theo 3 cấp role, Knowledge Base chuẩn hoá Markdown.</div>
+      </div>
+      <div class="foot">PHASE 1 · PROTOTYPE · NGOÀI HẠ TẦNG NỘI BỘ CÔNG TY (HCVN)</div>
+    </div>
+    <div class="login-form">
+      <h2>Đăng nhập</h2>
+      <div class="sub" data-vi="Dùng nội bộ — chọn tên bạn từ danh sách" data-en="Internal use — select your name from the list">Dùng nội bộ — chọn tên bạn từ danh sách</div>
+      <div class="field"><label data-vi="Tài khoản" data-en="Account">Tài khoản</label>
+        <select id="loginUserSelect">
+          <option>Hong Thuy — Head of Data &amp; AI for Finance</option>
+          <option>Minh Tram — Business Intelligence Team Leader</option>
+          <option>Huu Tri (Expert) — Business Intelligence Expert</option>
+          <option>Van Minh — Business Intelligence Expert</option>
+          <option>Hoang Phuc — Business Intelligence Analyst</option>
+          <option>Manh Tung — Business Intelligence Analyst</option>
+          <option>Ngoc Huy — Business Intelligence Analyst</option>
+          <option selected>Thinh Phat — Senior Business Intelligence Analyst</option>
+          <option>Bao Ngoc — Business Intelligence Analyst</option>
+          <option>Huu Tri (Senior) — Senior Business Intelligence Analyst</option>
+          <option>Thuy Tien — Business Intelligence Analyst</option>
+        </select>
+      </div>
+      <div class="field"><label data-vi="Mật khẩu" data-en="Password">Mật khẩu</label><input type="password" placeholder="••••••••"></div>
+      <div class="login-links">
+        <a href="#" id="openChangePw" data-vi="🔑 Đổi mật khẩu" data-en="🔑 Change password">🔑 Đổi mật khẩu</a>
+      </div>
+      <button class="btn-login">Đăng nhập</button>
+
+      <div class="change-pw-panel" id="changePwPanel" style="display:none;">
+        <div class="field"><label data-vi="Mật khẩu hiện tại" data-en="Current password">Mật khẩu hiện tại</label><input type="password" placeholder="••••••••"></div>
+        <div class="field"><label data-vi="Mật khẩu mới" data-en="New password">Mật khẩu mới</label><input type="password" placeholder="••••••••"></div>
+        <div class="field"><label data-vi="Nhập lại mật khẩu mới" data-en="Confirm new password">Nhập lại mật khẩu mới</label><input type="password" placeholder="••••••••"></div>
+        <button class="btn-login" data-vi="Lưu mật khẩu mới" data-en="Save new password">Lưu mật khẩu mới</button>
+        <div class="hint" data-vi="Nội bộ FINBI, không yêu cầu độ phức tạp mật khẩu cao — chỉ cần tối thiểu 6 ký tự." data-en="Internal FINBI use — no strict complexity required, minimum 6 characters.">Nội bộ FINBI, không yêu cầu độ phức tạp mật khẩu cao — chỉ cần tối thiểu 6 ký tự.</div>
+      </div>
+
+      <div class="divider">HOẶC DEMO NHANH THEO ROLE</div>
+      <div class="demo-roles">
+        <div class="demo-role-btn" data-role="Analyst" data-name="Hoang Phuc" data-title="Business Intelligence Analyst">
+          <div><div class="r-name">Hoang Phuc</div><div class="r-title">Business Intelligence Analyst</div></div>
+          <div class="r-role">Analyst</div>
+        </div>
+        <div class="demo-role-btn" data-role="Senior" data-name="Thinh Phat" data-title="Senior Business Intelligence Analyst">
+          <div><div class="r-name">Thinh Phat</div><div class="r-title">Senior Business Intelligence Analyst</div></div>
+          <div class="r-role">Senior/Expert</div>
+        </div>
+        <div class="demo-role-btn" data-role="Lead" data-name="Minh Tram" data-title="Business Intelligence Team Leader">
+          <div><div class="r-name">Minh Tram</div><div class="r-title">Business Intelligence Team Leader</div></div>
+          <div class="r-role">Lead</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ APP SHELL ============ -->
+<div class="app" id="screen-app" style="display:none;">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="mark"></span>
+      <span class="word">Farvis</span>
+      <span class="tag">FINBI</span>
+    </div>
+
+    <div class="module-switch">
+      <button class="module-btn active" data-module="document">📄 <span data-vi="Document" data-en="Document">Document</span></button>
+      <button class="module-btn" data-module="activity">🗓 <span data-vi="Activity Log" data-en="Activity Log">Activity Log</span></button>
+    </div>
+
+    <nav class="module-nav" data-module="document">
+      <div class="nav-label" data-vi="LÀM VIỆC" data-en="WORKSPACE">LÀM VIỆC</div>
+      <div class="nav-item active" data-view="chat" data-roles="Analyst,Senior,Lead">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span class="nav-label-text" data-vi="Hỏi & Trả lời" data-en="Ask & Answer">Hỏi &amp; Trả lời</span>
+      </div>
+      <div class="nav-item" data-view="kb" data-roles="Analyst,Senior,Lead">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <span class="nav-label-text">Knowledge Base</span>
+      </div>
+      <div class="nav-item" data-view="approval" data-roles="Analyst,Senior,Lead">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <span class="nav-label-text" data-vi="Chờ duyệt" data-en="Pending Approval">Chờ duyệt</span>
+        <span class="mono" style="margin-left:auto;font-size:10px;background:var(--brand);color:#fff;border-radius:10px;padding:1px 6px;">4</span>
+      </div>
+      <div class="nav-item" data-view="pin" data-roles="Analyst,Senior,Lead">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/></svg>
+        <span class="nav-label-text">Pinboard</span>
+      </div>
+
+      <div class="nav-label" data-vi="HỆ THỐNG" data-en="SYSTEM">HỆ THỐNG</div>
+      <div class="nav-item" data-view="admin" data-roles="Senior,Lead">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span class="nav-label-text" data-vi="RBAC & Vai trò" data-en="RBAC & Roles">RBAC &amp; Vai trò</span>
+      </div>
+      <div class="nav-item" data-view="users" data-roles="Lead">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span class="nav-label-text" data-vi="Quản lý User" data-en="User Management">Quản lý User</span>
+      </div>
+    </nav>
+
+    <nav class="module-nav" data-module="activity" style="display:none;">
+      <div class="nav-label" data-vi="CÁ NHÂN" data-en="PERSONAL">CÁ NHÂN</div>
+      <div class="nav-item" data-view="log" data-roles="Analyst,Senior,Lead">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        <span class="nav-label-text" data-vi="Log hôm nay" data-en="Today's Log">Log hôm nay</span>
+      </div>
+      <div class="nav-item" data-view="goals" data-roles="Analyst,Senior,Lead">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+        <span class="nav-label-text" data-vi="Goal tuần tới" data-en="Next Week Goals">Goal tuần tới</span>
+      </div>
+
+      <div class="nav-label" data-vi="TEAM (LEAD)" data-en="TEAM (LEAD)">TEAM (LEAD)</div>
+      <div class="nav-item" data-view="workload" data-roles="Lead">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+        <span class="nav-label-text" data-vi="Workload & Project" data-en="Workload & Project">Workload &amp; Project</span>
+      </div>
+      <div class="nav-item" data-view="report" data-roles="Lead">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+        <span class="nav-label-text" data-vi="Weekly Report" data-en="Weekly Report">Weekly Report</span>
+      </div>
+
+      <div class="nav-label" data-vi="HỆ THỐNG" data-en="SYSTEM">HỆ THỐNG</div>
+      <div class="nav-item" data-view="masterdata" data-roles="Lead">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg>
+        <span class="nav-label-text" data-vi="Topic / Stakeholder / Project" data-en="Topic / Stakeholder / Project">Topic / Stakeholder / Project</span>
+      </div>
+    </nav>
+
+    <div class="sidebar-foot">
+      PHASE 1 · PROTOTYPE<br>Supabase · Drive · Deepseek
+      <button class="logout-btn" id="openChangePwApp">🔑 <span data-vi="Đổi mật khẩu" data-en="Change password">Đổi mật khẩu</span></button>
+      <button class="logout-btn" id="logoutBtn">⏻ <span data-vi="Đăng xuất" data-en="Log out">Đăng xuất</span></button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <div class="view-title" id="viewTitle">Hỏi &amp; Trả lời</div>
+        <div class="view-sub" id="viewSub">Tra cứu Treasury · Risk · Fin · EXCO — trả lời kèm trích dẫn nguồn</div>
+      </div>
+      <div class="topbar-right">
+        <div class="lang-switch">
+          <button class="lang-btn active" data-lang="vi">VI</button>
+          <button class="lang-btn" data-lang="en">EN</button>
+        </div>
+        <div class="quota-track">
+          <div class="row">
+            <span class="lbl" data-vi="Token hôm nay" data-en="Tokens today">Token hôm nay</span>
+            <span class="num"><b>182,400</b>&nbsp;/&nbsp;500,000</span>
+          </div>
+          <div class="quota-bar"><div class="quota-bar-fill" style="width:36%;"></div></div>
+        </div>
+        <div class="role-chip">
+          <div class="avatar" id="curAvatar">MT</div>
+          <div><div class="name" id="curName">Minh Tram</div><div class="role" id="curRole">Lead · Team Leader</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="disclaimer-bar">
+      <span class="ic">⚠️</span>
+      <span data-vi="Đây là bản thử nghiệm (Prototype) của Farvis — dùng để test workflow, chưa kết nối hệ thống thật. Vui lòng KHÔNG nhập dữ liệu confidential/nhạy cảm thật vào bản demo này. Dữ liệu/tài liệu trong bản Prototype được lưu trữ NGOÀI hạ tầng nội bộ của công ty (HCVN) — dùng dịch vụ cloud bên thứ 3 (Supabase, Google Drive)."
+            data-en="This is a Farvis Prototype — for workflow testing only, not connected to production systems. Please do NOT enter confidential or sensitive real data into this demo. Documents/data in this Prototype are stored OUTSIDE the company's (HCVN) internal infrastructure — using third-party cloud services (Supabase, Google Drive).">
+        Đây là bản thử nghiệm (Prototype) của Farvis — dùng để test workflow, chưa kết nối hệ thống thật. Vui lòng <b>KHÔNG</b> nhập dữ liệu confidential/nhạy cảm thật vào bản demo này. Dữ liệu/tài liệu trong bản Prototype được lưu trữ <b>NGOÀI hạ tầng nội bộ của công ty (HCVN)</b> — dùng dịch vụ cloud bên thứ 3 (Supabase, Google Drive).
+      </span>
+    </div>
+
+    <div class="content">
+
+      <!-- ============ CHAT VIEW ============ -->
+      <div class="view active" id="view-chat">
+        <div class="chat-layout">
+          <div class="thread">
+
+            <div class="q-bubble" data-vi="Threshold hiện tại của Risk cho FX exposure là bao nhiêu?" data-en="What is Risk's current threshold for FX exposure?">Threshold hiện tại của Risk cho FX exposure là bao nhiêu?</div>
+
+            <div class="a-card">
+              <div class="a-eyebrow">Farvis · Deepseek</div>
+              <p data-vi="Theo Risk Policy hiện hành, hạn mức FX exposure ròng tối đa là USD 25 triệu/entity, áp dụng riêng cho từng pháp nhân trong tập đoàn. Vượt ngưỡng này cần phê duyệt bổ sung từ EXCO trước khi giao dịch được thực hiện."
+                 data-en="Under the current Risk Policy, the maximum net FX exposure limit is USD 25 million per entity, applied separately to each legal entity in the group. Exceeding this threshold requires additional EXCO approval before the transaction can proceed.">
+                 Theo Risk Policy hiện hành, hạn mức FX exposure ròng tối đa là <b>USD 25 triệu/entity</b>, áp dụng riêng cho từng pháp nhân trong tập đoàn. Vượt ngưỡng này cần phê duyệt bổ sung từ EXCO trước khi giao dịch được thực hiện.</p>
+              <p data-vi="Ngưỡng này được Treasury Policy v4.1 tham chiếu trực tiếp tại mục quản lý rủi ro thị trường — hai tài liệu đang đồng bộ, không có chênh lệch."
+                 data-en="This threshold is directly referenced in Treasury Policy v4.1 under market risk management — the two documents are in sync, with no discrepancy.">
+                 Ngưỡng này được Treasury Policy v4.1 tham chiếu trực tiếp tại mục quản lý rủi ro thị trường — hai tài liệu đang đồng bộ, không có chênh lệch.</p>
+              <div class="cite-row">
+                <span class="cite"><span class="dot"></span>Risk Policy — FX Limits · v3.2 · 12/06/2026</span>
+                <span class="cite"><span class="dot"></span>Treasury Policy · v4.1 · §5.2</span>
+              </div>
+              <div class="cache-flag">
+                <span data-vi="⚡ Trả lời từ cache — lần đầu trả lời 3 ngày trước, nguồn chưa đổi version" data-en="⚡ Answered from cache — first answered 3 days ago, source version unchanged">⚡ Trả lời từ cache — lần đầu trả lời 3 ngày trước, nguồn chưa đổi version</span>
+                <a href="#" data-vi="Hỏi lại cho chắc →" data-en="Ask again to confirm →">Hỏi lại cho chắc →</a>
+              </div>
+            </div>
+
+            <div class="q-bubble" data-vi="Quy trình xử lý khi vượt hạn mức FX là gì?" data-en="What is the process for handling an FX limit breach?">Quy trình xử lý khi vượt hạn mức FX là gì?</div>
+
+            <div class="a-card">
+              <div class="a-eyebrow">Farvis · Deepseek</div>
+              <p data-vi="Khi vượt hạn mức, Treasury phải escalate lên EXCO trong vòng 24h, kèm biên bản đánh giá rủi ro từ Risk. EXCO sẽ quyết định phê duyệt bổ sung hoặc yêu cầu đóng bớt vị thế để đưa về trong hạn mức."
+                 data-en="When the limit is breached, Treasury must escalate to EXCO within 24h, together with a risk assessment note from Risk. EXCO then decides whether to grant additional approval or require the position to be reduced back within the limit.">
+                 Khi vượt hạn mức, Treasury phải escalate lên EXCO trong vòng 24h, kèm biên bản đánh giá rủi ro từ Risk. EXCO sẽ quyết định phê duyệt bổ sung hoặc yêu cầu đóng bớt vị thế để đưa về trong hạn mức.</p>
+              <div class="cite-row">
+                <span class="cite"><span class="dot"></span>Treasury Policy · v4.1 · §5.3</span>
+              </div>
+              <div class="token-flag">
+                <span class="mono" data-vi="Ước tính: ~2,100 token" data-en="Estimated: ~2,100 tokens">Ước tính: ~2,100 token</span>
+                <span class="token-sep">·</span>
+                <span class="mono" data-vi="Thực tế: 1,845 token" data-en="Actual: 1,845 tokens">Thực tế: 1,845 token</span>
+                <span class="token-diff-ok" data-vi="(thấp hơn ước tính 12%)" data-en="(12% lower than estimated)">(thấp hơn ước tính 12%)</span>
+              </div>
+            </div>
+
+            <div class="q-bubble" data-vi="Số tiền phê duyệt funding gói Q2 vừa rồi của EXCO là bao nhiêu?" data-en="How much was approved in EXCO's latest Q2 funding package?">Số tiền phê duyệt funding gói Q2 vừa rồi của EXCO là bao nhiêu?</div>
+
+            <div class="deny-card">
+              <span class="lbl" data-vi="Vượt quyền truy vấn" data-en="Access restricted">Vượt quyền truy vấn</span>
+              <span data-vi="Nội dung này yêu cầu quyền Lead trên domain EXCO. Vai trò hiện tại của bạn chỉ xem được quyết định EXCO ở mức tổng hợp, không bao gồm số tiền/hạn mức chi tiết. Vui lòng liên hệ Line Manager trực tiếp nếu cần xem đầy đủ."
+                    data-en="This content requires Lead-level access on the EXCO domain. Your current role can only view EXCO decisions at a summary level, without detailed amounts or limits. Please contact your Line Manager directly if you need full details.">
+                    Nội dung này yêu cầu quyền <b>Lead</b> trên domain EXCO. Vai trò hiện tại của bạn chỉ xem được quyết định EXCO ở mức tổng hợp, không bao gồm số tiền/hạn mức chi tiết. Vui lòng liên hệ Line Manager trực tiếp nếu cần xem đầy đủ.</span>
+            </div>
+
+          </div>
+
+          <div class="side-panel">
+            <div class="card-titled">
+              <div class="bar"><span class="t" style="font-size:12.5px;" data-vi="Câu hỏi liên quan" data-en="Related questions">Câu hỏi liên quan</span></div>
+              <div class="body">
+                <div class="related-q" data-vi="Threshold FX có khác nhau giữa các entity không?" data-en="Does the FX threshold differ across entities?">Threshold FX có khác nhau giữa các entity không?</div>
+                <div class="related-q" data-vi="Ai là người phê duyệt khi vượt ngưỡng FX?" data-en="Who approves when the FX threshold is exceeded?">Ai là người phê duyệt khi vượt ngưỡng FX?</div>
+                <div class="related-q" data-vi="Lịch sử thay đổi threshold FX 12 tháng qua?" data-en="FX threshold change history over the past 12 months?">Lịch sử thay đổi threshold FX 12 tháng qua?</div>
+              </div>
+            </div>
+            <div class="card-titled">
+              <div class="bar"><span class="t" style="font-size:12.5px;" data-vi="Phiên hôm nay" data-en="Today's session">Phiên hôm nay</span></div>
+              <div class="body">
+                <div class="stat-row"><span data-vi="Token đã dùng (tính quota)" data-en="Tokens used (counted)">Token đã dùng (tính quota)</span><b>182,400</b></div>
+                <div class="stat-row"><span data-vi="Token tiết kiệm nhờ cache" data-en="Tokens saved via cache">Token tiết kiệm nhờ cache</span><b>~104,600</b></div>
+                <div class="stat-row"><span data-vi="Từ chối (vượt quyền)" data-en="Denied (access)">Từ chối (vượt quyền)</span><b>5</b></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="composer">
+          <input type="text" data-vi-ph="Đặt câu hỏi về Treasury, Risk, Fin, EXCO…" data-en-ph="Ask about Treasury, Risk, Fin, EXCO…" placeholder="Đặt câu hỏi về Treasury, Risk, Fin, EXCO…">
+          <div class="composer-foot">
+            <span class="composer-hint" data-vi="Câu trả lời trùng/tương tự đã hỏi sẽ được dùng lại tự động, không trừ quota" data-en="Duplicate or similar questions are answered automatically from cache — no quota used">Câu trả lời trùng/tương tự đã hỏi sẽ được dùng lại tự động, không trừ quota</span>
+            <button class="send-btn" data-vi="Gửi câu hỏi" data-en="Send">Gửi câu hỏi</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ KB VIEW ============ -->
+      <div class="view" id="view-kb">
+        <div class="kb-toolbar">
+          <div class="chip-row">
+            <span class="filter-chip on" data-vi="Tất cả" data-en="All">Tất cả</span>
+            <span class="filter-chip">Treasury</span>
+            <span class="filter-chip">Risk</span>
+            <span class="filter-chip">Fin</span>
+            <span class="filter-chip">EXCO</span>
+          </div>
+          <div class="chip-row" data-roles="Senior,Lead">
+            <button class="btn-primary" id="toggleAddDoc" data-vi="+ Thêm tài liệu mới" data-en="+ Insert new document">+ Thêm tài liệu mới</button>
+          </div>
+        </div>
+
+        <!-- ============ INSERT DOCUMENT PANEL ============ -->
+        <div class="add-doc-form" id="addDocForm" style="display:none;" data-roles="Senior,Lead">
+
+          <!-- Step 1: chọn cách nạp -->
+          <div class="doc-method-row" id="docMethodRow">
+            <div class="doc-method-card" data-method="paste">
+              <div class="dm-icon">📋</div>
+              <div class="dm-title" data-vi="Paste Markdown" data-en="Paste Markdown">Paste Markdown</div>
+              <div class="dm-sub" data-vi="Đã có sẵn nội dung Markdown, dán trực tiếp — không tốn token" data-en="Already have Markdown content, paste directly — no tokens used">Đã có sẵn nội dung Markdown, dán trực tiếp — không tốn token</div>
+            </div>
+            <div class="doc-method-card" data-method="upload">
+              <div class="dm-icon">📤</div>
+              <div class="dm-title" data-vi="Upload Document" data-en="Upload Document">Upload Document</div>
+              <div class="dm-sub" data-vi="Word / PDF / Excel / PPT / ảnh chụp — chọn cách convert ở bước sau" data-en="Word / PDF / Excel / PPT / scanned image — pick a conversion method next">Word / PDF / Excel / PPT / ảnh chụp — chọn cách convert ở bước sau</div>
+            </div>
+          </div>
+
+          <!-- Step 2a: Paste Markdown -->
+          <div class="doc-step" id="pasteStep" style="display:none;">
+            <div class="field">
+              <label data-vi="Nội dung Markdown" data-en="Markdown content">Nội dung Markdown</label>
+              <textarea id="pasteMdText" style="min-height:120px;" data-vi-ph="Dán nội dung Markdown đã soạn sẵn vào đây…" data-en-ph="Paste your pre-written Markdown content here…" placeholder="Dán nội dung Markdown đã soạn sẵn vào đây…"></textarea>
+            </div>
+            <div class="doc-meta-fields">
+              <div class="field"><label data-vi="Domain" data-en="Domain">Domain</label><select><option>Treasury</option><option>Risk</option><option>Fin</option><option>EXCO</option></select></div>
+              <div class="field"><label data-vi="Loại tài liệu" data-en="Document type">Loại tài liệu</label><select><option data-vi="Policy" data-en="Policy">Policy</option><option data-vi="Quy định nội bộ" data-en="Internal regulation">Quy định nội bộ</option><option data-vi="Biên bản họp" data-en="Meeting minutes">Biên bản họp</option><option data-vi="Quyết định phê duyệt" data-en="Approval decision">Quyết định phê duyệt</option></select></div>
+              <div class="field"><label data-vi="Data Label" data-en="Data Label">Data Label</label><select><option>Public</option><option selected>General</option><option>Confidential</option><option>Highly Confidential</option></select></div>
+            </div>
+            <button class="btn-approve" id="submitPasteBtn" data-vi="Gửi duyệt (Cách 1)" data-en="Submit for approval (Method 1)">Gửi duyệt (Cách 1)</button>
+          </div>
+
+          <!-- Step 2b: Upload -->
+          <div class="doc-step" id="uploadStep" style="display:none;">
+            <div class="field">
+              <label data-vi="Chọn file" data-en="Choose file">Chọn file</label>
+              <input type="file" id="docFileInput">
+            </div>
+
+            <div id="generateMethodRow" class="doc-method-row" style="display:none;margin-top:14px;">
+              <div class="doc-method-card" data-genmethod="script">
+                <div class="dm-icon">⚙️</div>
+                <div class="dm-title" data-vi="Generate bằng Script" data-en="Generate via Script">Generate bằng Script</div>
+                <div class="dm-sub" data-vi="Script Python có sẵn (team dev maintain) — không tốn token, chỉ dùng cho file đã có rule parse" data-en="Existing Python script (maintained by dev team) — no tokens used, only for file types with an existing parse rule">Script Python có sẵn (team dev maintain) — không tốn token, chỉ dùng cho file đã có rule parse</div>
+              </div>
+              <div class="doc-method-card" data-genmethod="ai">
+                <div class="dm-icon">✨</div>
+                <div class="dm-title" data-vi="Generate bằng AI" data-en="Generate via AI">Generate bằng AI</div>
+                <div class="dm-sub" data-vi="Deepseek đọc + convert — tốn token, dùng khi script chưa xử lý được" data-en="Deepseek reads + converts — uses tokens, for files the script can't handle">Deepseek đọc + convert — tốn token, dùng khi script chưa xử lý được</div>
+              </div>
+            </div>
+
+            <div id="genPreviewBlock" style="display:none;margin-top:14px;">
+              <div class="composer-hint" id="genStatusText" style="margin-bottom:10px;display:block;" data-vi="⚙️ Đang convert bằng Script — không tốn token…" data-en="⚙️ Converting via Script — no tokens used…">⚙️ Đang convert bằng Script — không tốn token…</div>
+              <div class="field">
+                <label data-vi="Preview Markdown (bắt buộc review trước khi gửi duyệt)" data-en="Markdown preview (review required before submitting)">Preview Markdown (bắt buộc review trước khi gửi duyệt)</label>
+                <textarea id="genPreviewText" style="min-height:120px;"></textarea>
+              </div>
+              <div class="doc-meta-fields">
+                <div class="field"><label data-vi="Domain" data-en="Domain">Domain</label><select><option>Treasury</option><option>Risk</option><option>Fin</option><option>EXCO</option></select></div>
+                <div class="field"><label data-vi="Loại tài liệu" data-en="Document type">Loại tài liệu</label><select><option data-vi="Policy" data-en="Policy">Policy</option><option data-vi="Quy định nội bộ" data-en="Internal regulation">Quy định nội bộ</option><option data-vi="Biên bản họp" data-en="Meeting minutes">Biên bản họp</option><option data-vi="Quyết định phê duyệt" data-en="Approval decision">Quyết định phê duyệt</option></select></div>
+                <div class="field"><label data-vi="Data Label" data-en="Data Label">Data Label</label><select><option>Public</option><option selected>General</option><option>Confidential</option><option>Highly Confidential</option></select></div>
+              </div>
+              <div class="approval-actions" style="margin:14px 0 0;padding:0;">
+                <button class="btn-approve" id="submitUploadBtn" data-vi="Gửi duyệt" data-en="Submit for approval">Gửi duyệt</button>
+                <button class="btn-reject" id="regenBtn" data-vi="Generate lại" data-en="Regenerate">Generate lại</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="card-titled">
+          <div class="bar">
+            <span class="t" data-vi="Danh sách tài liệu" data-en="Document list">Danh sách tài liệu</span>
+            <span class="s" data-vi="18 tài liệu · cập nhật gần nhất hôm nay" data-en="18 documents · last updated today">18 tài liệu · cập nhật gần nhất hôm nay</span>
+          </div>
+          <table class="kb-table">
+            <thead>
+              <tr>
+                <th data-vi="Tài liệu" data-en="Document">Tài liệu</th>
+                <th>Domain</th>
+                <th data-vi="Loại" data-en="Type">Loại</th>
+                <th>Version</th>
+                <th data-vi="Data Label" data-en="Data Label">Data Label</th>
+                <th data-vi="Trạng thái" data-en="Status">Trạng thái</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div class="doc-name">Risk Policy — FX Limits</div>
+                  <div class="doc-meta" data-vi="Hiệu lực 12/06/2026 · approved bởi Nguyễn Văn Tùng" data-en="Effective 12/06/2026 · approved by Nguyễn Văn Tùng">Hiệu lực 12/06/2026 · approved bởi Nguyễn Văn Tùng</div></td>
+                <td>Risk</td>
+                <td>Policy</td><td>v3.2</td>
+                <td class="sens-2">Confidential</td>
+                <td><span class="tag-pill tag-published">Published</span></td>
+              </tr>
+              <tr>
+                <td><div class="doc-name">Treasury Policy — Market Risk Mgmt</div>
+                  <div class="doc-meta" data-vi="Hiệu lực 02/05/2026 · approved bởi Minh Tram" data-en="Effective 02/05/2026 · approved by Minh Tram">Hiệu lực 02/05/2026 · approved bởi Minh Tram</div></td>
+                <td>Treasury</td>
+                <td>Policy</td><td>v4.1</td>
+                <td class="sens-1" data-vi="General" data-en="General">General</td>
+                <td><span class="tag-pill tag-published">Published</span></td>
+              </tr>
+              <tr>
+                <td><div class="doc-name">EXCO Decision Record — Funding Q2</div>
+                  <div class="doc-meta" data-vi="Kỳ họp 18/07/2026" data-en="Meeting date 18/07/2026">Kỳ họp 18/07/2026</div></td>
+                <td>EXCO</td>
+                <td data-vi="Quyết định phê duyệt" data-en="Approval decision">Quyết định phê duyệt</td><td>v1.0</td>
+                <td class="sens-3">Highly Confidential</td>
+                <td><span class="tag-pill tag-published">Published</span></td>
+              </tr>
+              <tr>
+                <td><div class="doc-name">Fin Policy — Cost Allocation 2026</div>
+                  <div class="doc-meta" data-vi="Upload bởi Đặng Khoa · chờ Lead duyệt (2 cấp)" data-en="Uploaded by Đặng Khoa · awaiting 2-level Lead approval">Upload bởi Đặng Khoa · chờ Lead duyệt (2 cấp)</div></td>
+                <td>Fin</td>
+                <td data-vi="Quy định nội bộ" data-en="Internal regulation">Quy định nội bộ</td><td>v2.0 (nháp)</td>
+                <td class="sens-2">Confidential</td>
+                <td><span class="tag-pill tag-pending" data-vi="Chờ duyệt" data-en="Pending">Chờ duyệt</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ============ APPROVAL VIEW ============ -->
+      <div class="view" id="view-approval">
+
+        <div class="card-titled approval-card">
+          <div class="bar"><span class="t">Fin Policy — Cost Allocation 2026 (v2.0)</span></div>
+          <div class="approval-head" style="padding-top:14px;">
+            <div class="approval-meta" data-vi="Đề xuất bởi Thinh Phat · Senior/Expert · 2 giờ trước · Cách 3 — Generate bằng AI (Deepseek)" data-en="Submitted by Thinh Phat · Senior/Expert · 2 hours ago · Method 3 — Generate via AI (Deepseek)">Đề xuất bởi Thinh Phat · Senior/Expert · 2 giờ trước · Cách 3 — Generate bằng AI (Deepseek)</div>
+            <div class="vote-score">👍 9&nbsp;&nbsp;👎 1</div>
+          </div>
+          <div class="approval-labels">
+            <span class="tag-pill" style="background:var(--brand-soft-bg);color:var(--brand);">Fin</span>
+            <span class="tag-pill" style="background:#F0F0F0;color:var(--muted);" data-vi="Quy định nội bộ" data-en="Internal regulation">Quy định nội bộ</span>
+            <span class="tag-pill" style="background:#FDE1E7;color:var(--brand-vivid);">Confidential</span>
+          </div>
+          <div class="approval-progress">
+            <div class="progress-step done"><div class="num" data-vi="Cấp 1/2 — chờ" data-en="Level 1/2 — pending">Cấp 1/2 — chờ</div><div class="who">Minh Tram</div></div>
+            <div class="progress-step"><div class="num" data-vi="Cấp 2/2 — chưa tới lượt" data-en="Level 2/2 — not yet">Cấp 2/2 — chưa tới lượt</div><div class="who">Hong Thuy</div></div>
+          </div>
+          <div class="approval-actions" style="margin-top:12px;">
+            <button class="btn-preview">👁 <span data-vi="Xem lại tài liệu" data-en="Review document">Xem lại tài liệu</span></button>
+          </div>
+          <div class="approval-actions" data-roles="Lead">
+            <button class="btn-approve" data-vi="Duyệt" data-en="Approve">Duyệt</button>
+            <button class="btn-reject" data-vi="Từ chối" data-en="Reject">Từ chối</button>
+          </div>
+          <div class="approval-actions" data-roles="Analyst,Senior">
+            <button class="btn-vote">👍 Vote</button>
+            <button class="btn-vote">👎 Vote</button>
+          </div>
+          <div class="approver-note" data-vi="Data Label Confidential → cần 2 cấp duyệt. Cấp 1: Minh Tram (Line Manager của Thinh Phat). Sau khi Minh Tram duyệt, hệ thống tự chuyển lên Cấp 2: Hong Thuy (Line Manager của Minh Tram)." data-en="Confidential data label → requires 2-level approval. Level 1: Minh Tram (Thinh Phat's Line Manager). After Minh Tram approves, the system automatically moves to Level 2: Hong Thuy (Minh Tram's Line Manager).">Data Label Confidential → cần 2 cấp duyệt. Cấp 1: Minh Tram (Line Manager của Thinh Phat). Sau khi Minh Tram duyệt, hệ thống tự chuyển lên Cấp 2: Hong Thuy (Line Manager của Minh Tram).</div>
+        </div>
+
+        <div class="card-titled approval-card">
+          <div class="bar"><span class="t">Biên bản họp Risk Committee — Tháng 7</span></div>
+          <div class="approval-head" style="padding-top:14px;">
+            <div class="approval-meta" data-vi="Đề xuất bởi Huu Tri (Senior) · Senior/Expert · 1 ngày trước · Cách 1 — Paste Markdown" data-en="Submitted by Huu Tri (Senior) · Senior/Expert · 1 day ago · Method 1 — Paste Markdown">Đề xuất bởi Huu Tri (Senior) · Senior/Expert · 1 ngày trước · Cách 1 — Paste Markdown</div>
+            <div class="vote-score">👍 14&nbsp;&nbsp;👎 0</div>
+          </div>
+          <div class="approval-labels">
+            <span class="tag-pill" style="background:var(--brand-soft-bg);color:var(--brand);">Risk</span>
+            <span class="tag-pill" style="background:#F0F0F0;color:var(--muted);" data-vi="Biên bản họp" data-en="Meeting minutes">Biên bản họp</span>
+            <span class="tag-pill" style="background:#EFEFEF;color:var(--muted-2);">General</span>
+          </div>
+          <div class="approval-actions" style="margin-top:12px;">
+            <button class="btn-preview">👁 <span data-vi="Xem lại tài liệu" data-en="Review document">Xem lại tài liệu</span></button>
+          </div>
+          <div class="approval-actions" data-roles="Lead">
+            <button class="btn-approve" data-vi="Duyệt" data-en="Approve">Duyệt</button>
+            <button class="btn-reject" data-vi="Từ chối" data-en="Reject">Từ chối</button>
+          </div>
+          <div class="approval-actions" data-roles="Analyst,Senior">
+            <button class="btn-vote">👍 Vote</button>
+            <button class="btn-vote">👎 Vote</button>
+          </div>
+          <div class="approver-note" data-vi="Data Label General → chỉ cần 1 cấp duyệt: Minh Tram (Line Manager của Huu Tri Senior)." data-en="General data label → only 1 approval level needed: Minh Tram (Huu Tri Senior's Line Manager).">Data Label General → chỉ cần 1 cấp duyệt: Minh Tram (Line Manager của Huu Tri Senior).</div>
+        </div>
+
+        <div class="card-titled approval-card">
+          <div class="bar"><span class="t">Báo cáo Cost Allocation — Template chuẩn Q3</span></div>
+          <div class="approval-head" style="padding-top:14px;">
+            <div class="approval-meta" data-vi="Đề xuất bởi Thuy Tien · Analyst · 5 giờ trước · Cách 2 — Generate bằng Script (Python)" data-en="Submitted by Thuy Tien · Analyst · 5 hours ago · Method 2 — Generate via Script (Python)">Đề xuất bởi Thuy Tien · Analyst · 5 giờ trước · Cách 2 — Generate bằng Script (Python)</div>
+            <div class="vote-score">👍 6&nbsp;&nbsp;👎 0</div>
+          </div>
+          <div class="approval-labels">
+            <span class="tag-pill" style="background:var(--brand-soft-bg);color:var(--brand);">Fin</span>
+            <span class="tag-pill" style="background:#F0F0F0;color:var(--muted);">Policy</span>
+            <span class="tag-pill" style="background:#EFEFEF;color:var(--muted-2);">General</span>
+          </div>
+          <div class="approval-actions" style="margin-top:12px;">
+            <button class="btn-preview">👁 <span data-vi="Xem lại tài liệu" data-en="Review document">Xem lại tài liệu</span></button>
+          </div>
+          <div class="approval-actions" data-roles="Lead">
+            <button class="btn-approve" data-vi="Duyệt" data-en="Approve">Duyệt</button>
+            <button class="btn-reject" data-vi="Từ chối" data-en="Reject">Từ chối</button>
+          </div>
+          <div class="approval-actions" data-roles="Analyst,Senior">
+            <button class="btn-vote">👍 Vote</button>
+            <button class="btn-vote">👎 Vote</button>
+          </div>
+          <div class="approver-note" data-vi="Analyst không tự import được — dòng này chỉ minh hoạ; thực tế Analyst chỉ có quyền Vote, không đề xuất tài liệu." data-en="Analysts cannot import documents — this row is illustrative only; in practice Analysts can only Vote, not submit documents.">Analyst không tự import được — dòng này chỉ minh hoạ; thực tế Analyst chỉ có quyền Vote, không đề xuất tài liệu.</div>
+        </div>
+
+      </div>
+
+      <!-- ============ PINBOARD VIEW ============ -->
+      <div class="view" id="view-pin">
+        <div class="pin-grid">
+          <div class="card-titled">
+            <div class="bar"><span class="pin-domain">RISK</span></div>
+            <div class="body">
+              <div class="pin-q" data-vi="Threshold FX exposure hiện hành" data-en="Current FX exposure threshold">Threshold FX exposure hiện hành</div>
+              <div class="pin-snippet" style="margin-top:6px;" data-vi="USD 25 triệu/entity — theo Risk Policy v3.2, đồng bộ với Treasury Policy v4.1 §5.2." data-en="USD 25 million/entity — per Risk Policy v3.2, in sync with Treasury Policy v4.1 §5.2.">USD 25 triệu/entity — theo Risk Policy v3.2, đồng bộ với Treasury Policy v4.1 §5.2.</div>
+              <div class="pin-foot" data-vi="Pin bởi Minh Tram · 12/06/2026" data-en="Pinned by Minh Tram · 12/06/2026">Pin bởi Minh Tram · 12/06/2026</div>
+            </div>
+          </div>
+          <div class="card-titled">
+            <div class="bar"><span class="pin-domain">EXCO</span></div>
+            <div class="body">
+              <div class="pin-q" data-vi="Quyết định funding Q2 — trạng thái" data-en="Q2 funding decision — status">Quyết định funding Q2 — trạng thái</div>
+              <div class="pin-snippet" style="margin-top:6px;" data-vi="Approved, hạn mức trong ngân sách đã duyệt đầu năm. Không có ghi chú thay đổi so với kỳ trước." data-en="Approved, within the budget approved at the start of the year. No change notes compared to the previous period.">Approved, hạn mức trong ngân sách đã duyệt đầu năm. Không có ghi chú thay đổi so với kỳ trước.</div>
+              <div class="pin-foot" data-vi="Pin bởi Hong Thuy · 19/07/2026" data-en="Pinned by Hong Thuy · 19/07/2026">Pin bởi Hong Thuy · 19/07/2026</div>
+            </div>
+          </div>
+          <div class="card-titled">
+            <div class="bar"><span class="pin-domain">TREASURY</span></div>
+            <div class="body">
+              <div class="pin-q" data-vi="Quy trình xử lý vượt hạn mức" data-en="Process for handling limit breaches">Quy trình xử lý vượt hạn mức</div>
+              <div class="pin-snippet" style="margin-top:6px;" data-vi="Escalate lên EXCO trong vòng 24h, kèm biên bản đánh giá rủi ro từ Risk." data-en="Escalate to EXCO within 24h, together with a risk assessment note from Risk.">Escalate lên EXCO trong vòng 24h, kèm biên bản đánh giá rủi ro từ Risk.</div>
+              <div class="pin-foot" data-vi="Pin bởi Thinh Phat · 05/07/2026" data-en="Pinned by Thinh Phat · 05/07/2026">Pin bởi Thinh Phat · 05/07/2026</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ ADMIN / RBAC VIEW ============ -->
+      <div class="view" id="view-admin">
+        <div class="card-titled">
+          <div class="bar"><span class="t" data-vi="Ma trận phân quyền theo Role (3 cấp)" data-en="Role permission matrix (3 tiers)">Ma trận phân quyền theo Role (3 cấp)</span></div>
+          <table class="kb-table">
+            <thead>
+              <tr>
+                <th>Role</th>
+                <th data-vi="Phạm vi truy vấn" data-en="Query scope">Phạm vi truy vấn</th>
+                <th>Import</th>
+                <th data-vi="Duyệt" data-en="Approve">Duyệt</th>
+                <th data-vi="Giới hạn / ngày" data-en="Daily limit">Giới hạn / ngày</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="doc-name">Analyst</td>
+                <td data-vi="Chỉ bản published, không xem số liệu nhạy cảm" data-en="Published version only, no sensitive figures">Chỉ bản published, không xem số liệu nhạy cảm</td>
+                <td>—</td><td data-vi="Không (chỉ Vote)" data-en="No (Vote only)">Không (chỉ Vote)</td><td>20</td></tr>
+              <tr><td class="doc-name">Senior/Expert</td>
+                <td data-vi="Toàn bộ hiện hành + lịch sử version chuyên môn" data-en="All current docs + version history in own domain">Toàn bộ hiện hành + lịch sử version chuyên môn</td>
+                <td data-vi="Có (chờ duyệt)" data-en="Yes (pending approval)">Có (chờ duyệt)</td><td data-vi="Không (chỉ Vote)" data-en="No (Vote only)">Không (chỉ Vote)</td><td>50</td></tr>
+              <tr><td class="doc-name">Lead</td>
+                <td data-vi="Toàn bộ, mọi domain, mọi version" data-en="Everything, all domains, all versions">Toàn bộ, mọi domain, mọi version</td>
+                <td data-vi="Có" data-en="Yes">Có</td><td data-vi="Có" data-en="Yes">Có</td><td data-vi="150 (override được)" data-en="150 (overridable)">150 (override được)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ============ USER MANAGEMENT VIEW (Lead only) ============ -->
+      <div class="view" id="view-users">
+        <div class="users-toolbar">
+          <span class="filter-chip on" data-vi="11 user" data-en="11 users">11 user</span>
+          <button class="btn-primary" id="toggleAddUser" data-vi="+ Thêm user" data-en="+ Add user">+ Thêm user</button>
+        </div>
+
+        <div class="add-user-form" id="addUserForm" style="display:none;">
+          <div class="grid2">
+            <div class="field"><label data-vi="Họ tên" data-en="Full name">Họ tên</label><input type="text" data-vi-ph="VD: Nguyễn Thị Lan" data-en-ph="e.g. Nguyễn Thị Lan" placeholder="VD: Nguyễn Thị Lan"></div>
+            <div class="field"><label>Email</label><input type="text" placeholder="lan.nguyen@finbi.com"></div>
+            <div class="field"><label data-vi="Chức danh" data-en="Job title">Chức danh</label>
+              <select>
+                <option>Business Intelligence Analyst</option>
+                <option>Senior Business Intelligence Analyst</option>
+                <option>Business Intelligence Expert</option>
+                <option>Business Intelligence Team Leader</option>
+                <option>Head of Data & AI for Finance</option>
+              </select>
+            </div>
+            <div class="field"><label data-vi="Role (Farvis)" data-en="Role (Farvis)">Role (Farvis)</label>
+              <select><option>Analyst</option><option>Senior/Expert</option><option>Lead</option></select>
+            </div>
+            <div class="field" style="grid-column:1/-1;"><label data-vi="Line Manager (cấp trên trực tiếp)" data-en="Line Manager (direct superior)">Line Manager (cấp trên trực tiếp)</label>
+              <select>
+                <option data-vi="— Không có (đầu nhánh / cấp cao nhất) —" data-en="— None (root of hierarchy) —">— Không có (đầu nhánh / cấp cao nhất) —</option>
+                <option>Hong Thuy — Lead, Head of Data & AI</option>
+                <option>Minh Tram — Lead, Team Leader</option>
+                <option>Thinh Phat — Senior/Expert</option>
+                <option>Huu Tri (Senior) — Senior/Expert</option>
+                <option>Van Minh — Senior/Expert</option>
+                <option>Huu Tri (Expert) — Senior/Expert</option>
+              </select>
+            </div>
+          </div>
+          <div class="hint" data-vi="Line Manager sẽ được lưu dưới dạng parent_id trỏ tới user_id tương ứng trong bảng Users (Supabase) — dùng để tự động xác định 'cấp trên gần nhất có role Lead' khi duyệt tài liệu (mục 4.9)." data-en="Line Manager is stored as a parent_id referencing the corresponding user_id in the Users table (Supabase) — used to automatically resolve the 'nearest Lead-role approver' when approving documents (section 4.9).">Line Manager sẽ được lưu dưới dạng parent_id trỏ tới user_id tương ứng trong bảng Users (Supabase) — dùng để tự động xác định "cấp trên gần nhất có role Lead" khi duyệt tài liệu (mục 4.9).</div>
+          <div class="approval-actions" style="margin:14px 0 0;padding:0;">
+            <button class="btn-approve" data-vi="Lưu user" data-en="Save user">Lưu user</button>
+            <button class="btn-reject" data-vi="Huỷ" data-en="Cancel">Huỷ</button>
+          </div>
+        </div>
+
+        <div class="duplicate-note" data-vi="✓ Đã đối chiếu với dữ liệu tổ chức thật: 2 'Huu Tri' là 2 người khác nhau — Huu Tri (Expert) báo cáo trực tiếp Hong Thuy, Huu Tri (Senior) báo cáo Minh Tram. Toàn bộ Line Manager bên dưới đã khớp theo dữ liệu Leader/Division/Department bạn cung cấp." data-en="✓ Cross-checked against real org data: the 2 'Huu Tri' are different people — Huu Tri (Expert) reports directly to Hong Thuy, Huu Tri (Senior) reports to Minh Tram. All Line Managers below now match the Leader/Division/Department data you provided.">✓ Đã đối chiếu với dữ liệu tổ chức thật: 2 "Huu Tri" là 2 người khác nhau — Huu Tri (Expert) báo cáo trực tiếp Hong Thuy, Huu Tri (Senior) báo cáo Minh Tram. Toàn bộ Line Manager bên dưới đã khớp theo dữ liệu Leader/Division/Department bạn cung cấp.</div>
+
+        <div class="card-titled">
+          <div class="bar">
+            <span class="t" data-vi="Danh sách người dùng" data-en="User list">Danh sách người dùng</span>
+            <span class="s" data-vi="Sắp xếp theo cấu trúc parent–child" data-en="Sorted by parent–child structure">Sắp xếp theo cấu trúc parent–child</span>
+          </div>
+          <table class="kb-table">
+            <thead>
+              <tr>
+                <th data-vi="Họ tên" data-en="Full name">Họ tên</th>
+                <th data-vi="Chức danh" data-en="Job title">Chức danh</th>
+                <th data-vi="Role (Farvis)" data-en="Role (Farvis)">Role (Farvis)</th>
+                <th data-vi="Line Manager" data-en="Line Manager">Line Manager</th>
+                <th data-vi="Division / Dept" data-en="Division / Dept">Division / Dept</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="doc-name">Hong Thuy</td><td data-vi="Head of Data & AI for Finance" data-en="Head of Data & AI for Finance">Head of Data & AI for Finance</td>
+                <td><span class="role-badge role-Lead">Lead</span></td>
+                <td><span class="parent-chip" style="color:var(--brand-vivid);" data-vi="Wojdyla Roman (ngoài hệ thống)" data-en="Wojdyla Roman (outside system)"><span class="arrow">↳</span>Wojdyla Roman (ngoài hệ thống)</span></td>
+                <td class="doc-meta">Finance / Instant Business Data</td></tr>
+              <tr><td class="doc-name">Minh Tram</td><td>Business Intelligence Team Leader</td>
+                <td><span class="role-badge role-Lead">Lead</span></td>
+                <td><span class="parent-chip"><span class="arrow">↳</span>Hong Thuy</span></td>
+                <td class="doc-meta">Finance / Instant Business Data</td></tr>
+              <tr><td class="doc-name">Huu Tri <span style="color:var(--muted);font-weight:400;">(Expert)</span></td><td>Business Intelligence Expert</td>
+                <td><span class="role-badge role-Senior">Senior/Expert</span></td>
+                <td><span class="parent-chip"><span class="arrow">↳</span>Hong Thuy</span></td>
+                <td class="doc-meta">Finance / Instant Business Data</td></tr>
+              <tr><td class="doc-name">Van Minh</td><td>Business Intelligence Expert</td>
+                <td><span class="role-badge role-Senior">Senior/Expert</span></td>
+                <td><span class="parent-chip"><span class="arrow">↳</span>Hong Thuy</span></td>
+                <td class="doc-meta">Finance / Instant Business Data</td></tr>
+              <tr><td class="doc-name">Hoang Phuc</td><td>Business Intelligence Analyst</td>
+                <td><span class="role-badge role-Analyst">Analyst</span></td>
+                <td><span class="parent-chip"><span class="arrow">↳</span>Hong Thuy</span></td>
+                <td class="doc-meta">Finance / Instant Business Data</td></tr>
+              <tr><td class="doc-name">Manh Tung</td><td>Business Intelligence Analyst</td>
+                <td><span class="role-badge role-Analyst">Analyst</span></td>
+                <td><span class="parent-chip"><span class="arrow">↳</span>Hong Thuy</span></td>
+                <td class="doc-meta">Finance / Instant Business Data</td></tr>
+              <tr><td class="doc-name">Ngoc Huy</td><td>Business Intelligence Analyst</td>
+                <td><span class="role-badge role-Analyst">Analyst</span></td>
+                <td><span class="parent-chip"><span class="arrow">↳</span>Hong Thuy</span></td>
+                <td class="doc-meta">Finance / Instant Business Data</td></tr>
+              <tr><td class="doc-name">Thinh Phat</td><td>Senior Business Intelligence Analyst</td>
+                <td><span class="role-badge role-Senior">Senior/Expert</span></td>
+                <td><span class="parent-chip"><span class="arrow">↳</span>Minh Tram</span></td>
+                <td class="doc-meta">Finance / Instant Business Data</td></tr>
+              <tr><td class="doc-name">Bao Ngoc</td><td>Business Intelligence Analyst</td>
+                <td><span class="role-badge role-Analyst">Analyst</span></td>
+                <td><span class="parent-chip"><span class="arrow">↳</span>Minh Tram</span></td>
+                <td class="doc-meta">Finance / Instant Business Data</td></tr>
+              <tr><td class="doc-name">Huu Tri <span style="color:var(--muted);font-weight:400;">(Senior)</span></td><td>Senior Business Intelligence Analyst</td>
+                <td><span class="role-badge role-Senior">Senior/Expert</span></td>
+                <td><span class="parent-chip"><span class="arrow">↳</span>Minh Tram</span></td>
+                <td class="doc-meta">Finance / Instant Business Data</td></tr>
+              <tr><td class="doc-name">Thuy Tien</td><td>Business Intelligence Analyst</td>
+                <td><span class="role-badge role-Analyst">Analyst</span></td>
+                <td><span class="parent-chip"><span class="arrow">↳</span>Minh Tram</span></td>
+                <td class="doc-meta">Finance / Instant Business Data</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ============ ACTIVITY LOG MODULE ============ -->
+
+      <!-- ---- Log hôm nay ---- -->
+      <div class="view" id="view-log">
+        <div class="chat-layout">
+          <div class="card-titled">
+            <div class="bar">
+              <span class="t" data-vi="Log hoạt động" data-en="Log activity">Log hoạt động</span>
+              <span class="s" data-vi="Thứ 4, 29/07/2026" data-en="Wednesday, 29/07/2026">Thứ 4, 29/07/2026</span>
+            </div>
+            <div class="body log-form">
+              <div class="field">
+                <label data-vi="Topic" data-en="Topic">Topic</label>
+                <div class="topic-search" id="topicSearchWrap">
+                  <input type="text" id="topicSearchInput" autocomplete="off" data-vi-ph="Tìm topic theo tên, stakeholder, project…" data-en-ph="Search topic by name, stakeholder, project…" placeholder="Tìm topic theo tên, stakeholder, project…" value="Risk Dashboard — Data pipeline">
+                  <div class="topic-dropdown" id="topicDropdown">
+                    <div class="topic-option" data-name="Risk Dashboard — Data pipeline" data-stakeholder="Risk Committee" data-project="Risk Dashboard Revamp">
+                      <div class="opt-name">Risk Dashboard — Data pipeline</div>
+                      <div class="opt-ctx"><span class="opt-tag"><b>Project</b> · Risk Dashboard Revamp</span><span class="opt-tag"><b>Stakeholder</b> · Risk Committee</span></div>
+                    </div>
+                    <div class="topic-option" data-name="Risk Dashboard — Report automation" data-stakeholder="Risk Committee" data-project="Risk Dashboard Revamp">
+                      <div class="opt-name">Risk Dashboard — Report automation</div>
+                      <div class="opt-ctx"><span class="opt-tag"><b>Project</b> · Risk Dashboard Revamp</span><span class="opt-tag"><b>Stakeholder</b> · Risk Committee</span></div>
+                    </div>
+                    <div class="topic-option" data-name="EXCO Auto-report" data-stakeholder="EXCO Secretariat" data-project="EXCO Reporting Automation">
+                      <div class="opt-name">EXCO Auto-report</div>
+                      <div class="opt-ctx"><span class="opt-tag"><b>Project</b> · EXCO Reporting Automation</span><span class="opt-tag"><b>Stakeholder</b> · EXCO Secretariat</span></div>
+                    </div>
+                    <div class="topic-option" data-name="Data Lake Migration — Fin tables" data-stakeholder="CFO Office" data-project="Migrate Data Lake">
+                      <div class="opt-name">Data Lake Migration — Fin tables</div>
+                      <div class="opt-ctx"><span class="opt-tag"><b>Project</b> · Migrate Data Lake</span><span class="opt-tag"><b>Stakeholder</b> · CFO Office</span></div>
+                    </div>
+                    <div class="topic-option" data-name="Cost Allocation Model refresh" data-stakeholder="CFO Office" data-project="Cost Allocation Model">
+                      <div class="opt-name">Cost Allocation Model refresh</div>
+                      <div class="opt-ctx"><span class="opt-tag"><b>Project</b> · Cost Allocation Model</span><span class="opt-tag"><b>Stakeholder</b> · CFO Office</span></div>
+                    </div>
+                    <div class="topic-empty" id="topicEmpty" data-vi="Không tìm thấy topic phù hợp" data-en="No matching topic found" style="display:none;">Không tìm thấy topic phù hợp</div>
+                  </div>
+                </div>
+              </div>
+              <div class="topic-hint" id="topicHint">
+                <span class="cite"><span class="dot"></span><span id="hintStakeholder" data-vi="Stakeholder: Risk Committee" data-en="Stakeholder: Risk Committee">Stakeholder: Risk Committee</span></span>
+                <span class="cite"><span class="dot"></span><span id="hintProject" data-vi="Project: Risk Dashboard Revamp" data-en="Project: Risk Dashboard Revamp">Project: Risk Dashboard Revamp</span></span>
+              </div>
+
+              <div class="hour-input-row" style="margin-top:14px;">
+                <div class="field">
+                  <label data-vi="Số giờ dành cho topic này (hr)" data-en="Hours spent on this topic (hr)">Số giờ dành cho topic này (hr)</label>
+                  <input type="number" id="hourInput" step="0.5" min="0" value="1.5" data-vi-ph="VD: 1.5" data-en-ph="e.g. 1.5" placeholder="VD: 1.5">
+                </div>
+              </div>
+
+              <div class="field" style="margin-top:14px;">
+                <label><span class="entry-badge badge-progress" style="margin-right:6px;">Progress</span><span data-vi="Việc đã làm" data-en="Work done">Việc đã làm</span></label>
+                <textarea id="progressText" data-vi-ph="VD: Hoàn thành pipeline đồng bộ dữ liệu Risk từ core banking sang staging table…" data-en-ph="e.g. Finished the Risk data sync pipeline from core banking to staging table…" placeholder="VD: Hoàn thành pipeline đồng bộ dữ liệu Risk từ core banking sang staging table…"></textarea>
+              </div>
+              <div class="field" style="margin-top:14px;">
+                <label><span class="entry-badge badge-blocker" style="margin-right:6px;">Blocker</span><span data-vi="Khó khăn / vướng mắc (nếu có)" data-en="Difficulty / blocker (if any)">Khó khăn / vướng mắc (nếu có)</span></label>
+                <textarea id="blockerText" data-vi-ph="Mô tả vướng mắc cụ thể…" data-en-ph="Describe the specific blocker…" placeholder="Mô tả vướng mắc cụ thể…"></textarea>
+              </div>
+              <div class="field" style="margin-top:14px;">
+                <label><span class="entry-badge badge-note" style="margin-right:6px;">Note</span><span data-vi="Ghi chú thêm (nếu có)" data-en="Additional note (if any)">Ghi chú thêm (nếu có)</span></label>
+                <textarea id="noteText" data-vi-ph="Ghi chú khác cần lưu lại…" data-en-ph="Any other note to keep…" placeholder="Ghi chú khác cần lưu lại…"></textarea>
+              </div>
+
+              <div class="composer-foot" style="border:none;padding:0;margin-top:6px;">
+                <span class="composer-hint" data-vi="Điền mục nào có, để trống mục không áp dụng — có thể log nhiều Topic/ngày" data-en="Fill in whichever applies, leave the rest blank — you can log multiple Topics/day">Điền mục nào có, để trống mục không áp dụng — có thể log nhiều Topic/ngày</span>
+                <button class="send-btn" id="saveLogBtn" data-vi="Lưu log" data-en="Save log">Lưu log</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="side-panel">
+            <div class="card-titled">
+              <div class="bar"><span class="t" style="font-size:12.5px;" data-vi="Đã log hôm nay" data-en="Logged today">Đã log hôm nay</span></div>
+              <div class="hour-summary hour-under" id="hourSummary">
+                <div class="row">
+                  <span class="label" data-vi="Tổng giờ đã log / mục tiêu" data-en="Hours logged / target">Tổng giờ đã log / mục tiêu</span>
+                  <span class="hour-tag" id="hourTag" data-vi="Thiếu giờ" data-en="Under target">Thiếu giờ</span>
+                </div>
+                <div class="row" style="margin-bottom:8px;">
+                  <span class="value" id="hourValue">4.5 / 8.0h</span>
+                </div>
+                <div class="hour-bar-track"><div class="hour-bar-fill" id="hourBarFill" style="width:56%;"></div></div>
+              </div>
+              <div class="body" id="logEntriesList">
+                <div class="log-entry">
+                  <div class="meta"><span class="entry-badge badge-progress">Progress</span>Risk Dashboard — Data pipeline · 09:40 <span class="hr">1.5h</span></div>
+                  <span data-vi="Review lại schema staging table với Huu Tri (Senior)." data-en="Reviewed the staging table schema with Huu Tri (Senior).">Review lại schema staging table với Huu Tri (Senior).</span>
+                </div>
+                <div class="log-entry">
+                  <div class="meta"><span class="entry-badge badge-blocker">Blocker</span>EXCO Auto-report · 11:15 <span class="hr">1.0h</span></div>
+                  <span data-vi="Chưa lấy được quyền đọc từ Power BI Service, chờ IT cấp." data-en="Still waiting on IT to grant Power BI Service read access.">Chưa lấy được quyền đọc từ Power BI Service, chờ IT cấp.</span>
+                </div>
+                <div class="log-entry">
+                  <div class="meta"><span class="entry-badge badge-note">Note</span>Data Lake Migration — Fin tables · 14:20 <span class="hr">2.0h</span></div>
+                  <span data-vi="Đối chiếu số liệu bảng Fin với báo cáo tuần trước, chưa phát hiện lệch." data-en="Cross-checked Fin table figures against last week's report, no discrepancy found.">Đối chiếu số liệu bảng Fin với báo cáo tuần trước, chưa phát hiện lệch.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ---- Goal tuần tới ---- -->
+      <div class="view" id="view-goals">
+        <div class="card-titled">
+          <div class="bar">
+            <span class="t" data-vi="Goal tuần tới — theo Project" data-en="Next week goals — by Project">Goal tuần tới — theo Project</span>
+            <select id="weekSelect" class="week-select">
+              <option>Tuần 27/07 – 02/08/2026</option>
+              <option selected>Tuần 03/08 – 09/08/2026</option>
+              <option>Tuần 10/08 – 16/08/2026</option>
+            </select>
+          </div>
+          <div class="body">
+
+            <div class="add-goal-form" id="addGoalForm">
+              <div class="field">
+                <label data-vi="Project" data-en="Project">Project</label>
+                <select id="goalProjectSelect">
+                  <option value="Risk Dashboard Revamp">Risk Dashboard Revamp</option>
+                  <option value="EXCO Reporting Automation">EXCO Reporting Automation</option>
+                  <option value="Migrate Data Lake">Migrate Data Lake</option>
+                  <option value="Cost Allocation Model">Cost Allocation Model</option>
+                </select>
+              </div>
+              <div class="field">
+                <label data-vi="Chọn Topic (có thể chọn nhiều)" data-en="Select Topic(s) — multiple allowed">Chọn Topic (có thể chọn nhiều)</label>
+                <div class="topic-checklist" id="topicChecklist"></div>
+              </div>
+              <div class="field">
+                <label data-vi="Nội dung Goal" data-en="Goal description">Nội dung Goal</label>
+                <textarea id="goalTextInput" data-vi-ph="Mục tiêu tuần tới cho (các) topic đã chọn…" data-en-ph="Next week's goal for the selected topic(s)…" placeholder="Mục tiêu tuần tới cho (các) topic đã chọn…"></textarea>
+              </div>
+              <button class="btn-approve" id="addGoalBtn" data-vi="+ Thêm goal" data-en="+ Add goal">+ Thêm goal</button>
+              <div class="hint" data-vi="1 Project có thể tạo bao nhiêu Goal cũng được — mỗi Goal có thể gắn 1 hoặc nhiều Topic trong project đó." data-en="A Project can have as many Goals as needed — each Goal can be tagged with one or more Topics within that project.">1 Project có thể tạo bao nhiêu Goal cũng được — mỗi Goal có thể gắn 1 hoặc nhiều Topic trong project đó.</div>
+            </div>
+
+            <div id="goalListByProject" style="margin-top:18px;">
+              <div class="goal-project-group" data-project="Risk Dashboard Revamp">
+                <div class="goal-project-title">Risk Dashboard Revamp</div>
+                <div class="goal-card">
+                  <div class="goal-topics"><span class="cite"><span class="dot"></span>Risk Dashboard — Data pipeline</span></div>
+                  <div class="goal-text-display" data-vi="Hoàn thành QA pipeline và demo thử cho Risk Committee." data-en="Finish pipeline QA and run a trial demo for Risk Committee.">Hoàn thành QA pipeline và demo thử cho Risk Committee.</div>
+                </div>
+              </div>
+              <div class="goal-project-group" data-project="EXCO Reporting Automation">
+                <div class="goal-project-title">EXCO Reporting Automation</div>
+                <div class="goal-card">
+                  <div class="goal-topics"><span class="cite"><span class="dot"></span>EXCO Auto-report</span></div>
+                  <div class="goal-text-display" data-vi="Xin quyền đọc Power BI Service từ IT, hoàn thành trong tuần." data-en="Get Power BI Service read access approved by IT this week.">Xin quyền đọc Power BI Service từ IT, hoàn thành trong tuần.</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ---- Workload & Project View (Lead) ---- -->
+      <div class="view" id="view-workload">
+        <div class="filter-bar">
+          <div class="chip-row">
+            <span class="filter-chip on" data-vi="Tuần này" data-en="This week">Tuần này</span>
+            <span class="filter-chip" data-vi="Tuần trước" data-en="Last week">Tuần trước</span>
+            <span class="filter-chip" data-vi="Tuỳ chọn…" data-en="Custom…">Tuỳ chọn…</span>
+          </div>
+        </div>
+
+        <div class="card-titled" style="margin-bottom:14px;">
+          <div class="bar"><span class="t" data-vi="Theo Project" data-en="By Project">Theo Project</span><span class="s" data-vi="Số log trong tuần" data-en="Log count this week">Số log trong tuần</span></div>
+          <div class="body">
+            <div class="workload-row"><div class="workload-name">Risk Dashboard Revamp</div><div class="workload-bar-track"><div class="workload-bar-fill" style="width:85%;"></div></div><div class="workload-count">17 log</div></div>
+            <div class="workload-row"><div class="workload-name">EXCO Reporting Automation</div><div class="workload-bar-track"><div class="workload-bar-fill" style="width:60%;"></div></div><div class="workload-count">12 log</div></div>
+            <div class="workload-row"><div class="workload-name">Migrate Data Lake</div><div class="workload-bar-track"><div class="workload-bar-fill" style="width:35%;"></div></div><div class="workload-count">7 log</div></div>
+            <div class="workload-row"><div class="workload-name" style="color:var(--muted);" data-vi="Cost Allocation Model" data-en="Cost Allocation Model">Cost Allocation Model</div><div class="workload-bar-track"><div class="workload-bar-fill" style="width:6%;background:var(--muted-2);"></div></div><div class="workload-count">1 log</div></div>
+          </div>
+        </div>
+
+        <div class="card-titled">
+          <div class="bar"><span class="t" data-vi="Theo người" data-en="By person">Theo người</span><span class="s" data-vi="Số Topic tham gia trong tuần" data-en="Topics touched this week">Số Topic tham gia trong tuần</span></div>
+          <div class="body">
+            <div class="workload-row"><div class="workload-name">Thinh Phat</div><div class="workload-bar-track"><div class="workload-bar-fill" style="width:75%;"></div></div><div class="workload-count">3 topic</div></div>
+            <div class="workload-row"><div class="workload-name">Huu Tri (Senior)</div><div class="workload-bar-track"><div class="workload-bar-fill" style="width:50%;"></div></div><div class="workload-count">2 topic</div></div>
+            <div class="workload-row"><div class="workload-name">Van Minh</div><div class="workload-bar-track"><div class="workload-bar-fill" style="width:25%;"></div></div><div class="workload-count">1 topic</div></div>
+            <div class="workload-row"><div class="workload-name" style="color:var(--brand-vivid);" data-vi="Bao Ngoc (chưa log tuần này)" data-en="Bao Ngoc (no log this week)">Bao Ngoc (chưa log tuần này)</div><div class="workload-bar-track"><div class="workload-bar-fill" style="width:0%;"></div></div><div class="workload-count">0 topic</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ---- Weekly Report (Lead) ---- -->
+      <div class="view" id="view-report">
+        <div class="md-toolbar">
+          <div class="md-tabs">
+            <span class="md-tab on" data-vi="Tuần 21/07 – 27/07" data-en="Week 21/07 – 27/07">Tuần 21/07 – 27/07</span>
+            <span class="md-tab" data-vi="Tuần trước" data-en="Previous weeks">Tuần trước</span>
+          </div>
+          <span class="tag-pill tag-pending" data-vi="Draft — chưa publish" data-en="Draft — not published">Draft — chưa publish</span>
+        </div>
+
+        <div class="card-titled">
+          <div class="bar">
+            <span class="t" data-vi="Weekly Report — Team FINBI" data-en="Weekly Report — Team FINBI">Weekly Report — Team FINBI</span>
+            <span class="s" data-vi="AI tổng hợp · Deepseek" data-en="AI-generated · Deepseek">AI tổng hợp · Deepseek</span>
+          </div>
+          <div class="body">
+            <div class="report-section">
+              <h4 data-vi="1. Tổng hợp theo team" data-en="1. Team summary">1. Tổng hợp theo team</h4>
+              <p style="font-size:13px;margin:0;" data-vi="Team tập trung chủ yếu vào Risk Dashboard Revamp (17 log) và EXCO Reporting Automation (12 log) trong tuần. Migrate Data Lake tiến triển chậm hơn, cần theo dõi thêm." data-en="The team focused mainly on Risk Dashboard Revamp (17 logs) and EXCO Reporting Automation (12 logs) this week. Migrate Data Lake progressed more slowly and needs closer follow-up.">Team tập trung chủ yếu vào Risk Dashboard Revamp (17 log) và EXCO Reporting Automation (12 log) trong tuần. Migrate Data Lake tiến triển chậm hơn, cần theo dõi thêm.</p>
+            </div>
+            <div class="report-section">
+              <h4 data-vi="2. Achievement trong tuần" data-en="2. Achievements this week">2. Achievement trong tuần</h4>
+              <ul>
+                <li data-vi="Hoàn thành pipeline đồng bộ dữ liệu Risk sang staging table (Risk Dashboard Revamp)." data-en="Completed the Risk data sync pipeline to the staging table (Risk Dashboard Revamp).">Hoàn thành pipeline đồng bộ dữ liệu Risk sang staging table (Risk Dashboard Revamp).</li>
+                <li data-vi="Demo thử nghiệm EXCO Auto-report cho 2 thành viên EXCO Secretariat." data-en="Ran a trial demo of EXCO Auto-report for 2 EXCO Secretariat members.">Demo thử nghiệm EXCO Auto-report cho 2 thành viên EXCO Secretariat.</li>
+              </ul>
+            </div>
+            <div class="report-section">
+              <h4 data-vi="3. Goal tuần tới" data-en="3. Next week goals">3. Goal tuần tới</h4>
+              <ul>
+                <li><span class="report-topic-tag">Risk Dashboard — Data pipeline:</span> <span data-vi="Hoàn thành QA pipeline và demo thử cho Risk Committee." data-en="Finish pipeline QA and run a trial demo for Risk Committee.">Hoàn thành QA pipeline và demo thử cho Risk Committee.</span></li>
+              </ul>
+            </div>
+            <div class="report-section" style="margin-bottom:0;">
+              <h4 data-vi="4. Khó khăn / vướng mắc theo Topic" data-en="4. Difficulties by Topic">4. Khó khăn / vướng mắc theo Topic</h4>
+              <ul>
+                <li><span class="report-topic-tag">EXCO Auto-report:</span> <span data-vi="Chưa lấy được quyền đọc từ Power BI Service, đang chờ IT cấp." data-en="Still waiting on IT to grant Power BI Service read access.">Chưa lấy được quyền đọc từ Power BI Service, đang chờ IT cấp.</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="approval-actions" style="margin:14px 0 0;padding:0;">
+          <button class="btn-approve" data-vi="Duyệt & Publish" data-en="Approve & Publish">Duyệt &amp; Publish</button>
+          <button class="btn-reject" data-vi="Generate lại" data-en="Regenerate">Generate lại</button>
+        </div>
+      </div>
+
+      <!-- ---- Master data: Topic / Stakeholder / Project (Lead) ---- -->
+      <div class="view" id="view-masterdata">
+        <div class="md-toolbar">
+          <div class="md-tabs">
+            <span class="md-tab on" data-view-tab="topics" data-vi="Topics" data-en="Topics">Topics</span>
+            <span class="md-tab" data-view-tab="stakeholders" data-vi="Stakeholders" data-en="Stakeholders">Stakeholders</span>
+            <span class="md-tab" data-view-tab="projects" data-vi="Projects" data-en="Projects">Projects</span>
+          </div>
+          <button class="btn-primary" data-vi="+ Thêm mới" data-en="+ Add new">+ Thêm mới</button>
+        </div>
+
+        <div class="card-titled">
+          <div class="bar"><span class="t" data-vi="Danh sách Topic" data-en="Topic list">Danh sách Topic</span></div>
+          <table class="kb-table">
+            <thead>
+              <tr>
+                <th data-vi="Topic" data-en="Topic">Topic</th>
+                <th data-vi="Stakeholder" data-en="Stakeholder">Stakeholder</th>
+                <th data-vi="Project" data-en="Project">Project</th>
+                <th data-vi="Người phụ trách" data-en="Owner">Người phụ trách</th>
+                <th data-vi="Trạng thái" data-en="Status">Trạng thái</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="doc-name">Risk Dashboard — Data pipeline</td><td>Risk Committee</td><td>Risk Dashboard Revamp</td><td>Huu Tri (Senior)</td><td><span class="tag-pill tag-published" data-vi="Active" data-en="Active">Active</span></td></tr>
+              <tr><td class="doc-name">Risk Dashboard — Report automation</td><td>Risk Committee</td><td>Risk Dashboard Revamp</td><td>Thinh Phat</td><td><span class="tag-pill tag-published" data-vi="Active" data-en="Active">Active</span></td></tr>
+              <tr><td class="doc-name">EXCO Auto-report</td><td>EXCO Secretariat</td><td>EXCO Reporting Automation</td><td>Thinh Phat</td><td><span class="tag-pill tag-published" data-vi="Active" data-en="Active">Active</span></td></tr>
+              <tr><td class="doc-name">Data Lake Migration — Fin tables</td><td>CFO Office</td><td>Migrate Data Lake</td><td>Van Minh</td><td><span class="tag-pill tag-published" data-vi="Active" data-en="Active">Active</span></td></tr>
+              <tr><td class="doc-name">Cost Allocation Model refresh</td><td>CFO Office</td><td>Cost Allocation Model</td><td>Bao Ngoc</td><td><span class="tag-pill tag-pending" data-vi="On-hold" data-en="On-hold">On-hold</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+
+    <div class="app-footer">
+      <div class="left">
+        <span class="dot"></span>
+        <span data-vi="Farvis — Prototype nội bộ FINBI · Phase 1" data-en="Farvis — FINBI Internal Prototype · Phase 1">Farvis — Prototype nội bộ FINBI · Phase 1</span>
+      </div>
+      <div class="right">v0.1-prototype · deepseek · supabase</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CHANGE PASSWORD MODAL (trong app) ============ -->
+<div id="pwModalOverlay" class="pw-modal-overlay" style="display:none;">
+  <div class="pw-modal">
+    <div class="pw-modal-head">
+      <span data-vi="Đổi mật khẩu" data-en="Change password">Đổi mật khẩu</span>
+      <button id="closePwModal" class="pw-modal-close">✕</button>
+    </div>
+    <div class="change-pw-panel" style="margin-top:0;border:none;background:transparent;padding:16px 0 0;">
+      <div class="field"><label data-vi="Mật khẩu hiện tại" data-en="Current password">Mật khẩu hiện tại</label><input type="password" placeholder="••••••••"></div>
+      <div class="field"><label data-vi="Mật khẩu mới" data-en="New password">Mật khẩu mới</label><input type="password" placeholder="••••••••"></div>
+      <div class="field"><label data-vi="Nhập lại mật khẩu mới" data-en="Confirm new password">Nhập lại mật khẩu mới</label><input type="password" placeholder="••••••••"></div>
+      <button class="btn-login" data-vi="Lưu mật khẩu mới" data-en="Save new password">Lưu mật khẩu mới</button>
+      <div class="hint" data-vi="Nội bộ FINBI, không yêu cầu độ phức tạp mật khẩu cao — chỉ cần tối thiểu 6 ký tự." data-en="Internal FINBI use — no strict complexity required, minimum 6 characters.">Nội bộ FINBI, không yêu cầu độ phức tạp mật khẩu cao — chỉ cần tối thiểu 6 ký tự.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const titles = {
+    chat:     { vi:["Hỏi & Trả lời", "Tra cứu Treasury · Risk · Fin · EXCO — trả lời kèm trích dẫn nguồn"],
+                en:["Ask & Answer", "Look up Treasury · Risk · Fin · EXCO — answers with source citations"] },
+    kb:       { vi:["Knowledge Base", "Tài liệu đã chuẩn hoá Markdown, có version & mức nhạy cảm"],
+                en:["Knowledge Base", "Documents standardized to Markdown, versioned & sensitivity-labeled"] },
+    approval: { vi:["Chờ duyệt", "Vote mang tính tham khảo — Approve là quyết định chính thức"],
+                en:["Pending Approval", "Votes are advisory — Approve is the official decision"] },
+    pin:      { vi:["Pinboard", "Kết quả đã verify, tách biệt khỏi lịch sử chat"],
+                en:["Pinboard", "Verified results, kept separate from chat history"] },
+    admin:    { vi:["RBAC & Vai trò", "Cấu hình quyền theo role — chỉ Lead chỉnh sửa được"],
+                en:["RBAC & Roles", "Role-based permission config — Lead-only editing"] },
+    users:    { vi:["Quản lý User", "Thêm user, gán role, khai báo Line Manager"],
+                en:["User Management", "Add users, assign role, set Line Manager"] },
+    log:      { vi:["Log hoạt động", "Log công việc hàng ngày theo Topic"],
+                en:["Activity Log", "Log daily work by Topic"] },
+    goals:    { vi:["Goal tuần tới", "Nhập mục tiêu tuần tới theo từng Topic đang phụ trách"],
+                en:["Next Week Goals", "Set next week's goal for each Topic you own"] },
+    workload: { vi:["Workload & Project", "Xem project/topic nào đang được quan tâm — không cần AI, đếm trực tiếp từ log"],
+                en:["Workload & Project", "See which project/topic gets the most attention — direct log counts, no AI"] },
+    report:   { vi:["Weekly Report", "AI tổng hợp báo cáo tuần — Lead review & publish trước khi gửi"],
+                en:["Weekly Report", "AI-generated weekly report — Lead reviews & publishes before sending"] },
+    masterdata:{ vi:["Topic / Stakeholder / Project", "Quản lý danh sách nền — mỗi Topic gắn đúng 1 Stakeholder + 1 Project"],
+                en:["Topic / Stakeholder / Project", "Manage master data — each Topic maps to exactly 1 Stakeholder + 1 Project"] }
+  };
+
+  let currentLang = 'vi';
+  let currentView = 'chat';
+  let currentRole = 'Lead';
+  let currentModule = 'document';
+
+  const roleLabel = {Analyst:'Analyst', Senior:'Senior/Expert', Lead:'Lead'};
+  const avatarInitials = {Hoang_Phuc:'HP', Thinh_Phat:'TP', Minh_Tram:'MT'};
+
+  function applyLanguage(){
+    document.documentElement.lang = currentLang;
+    document.querySelectorAll('[data-vi]').forEach(el=>{
+      const val = el.dataset[currentLang];
+      if(val !== undefined) el.textContent = val;
+    });
+    document.querySelectorAll('[data-vi-ph]').forEach(el=>{
+      const val = currentLang === 'vi' ? el.dataset.viPh : el.dataset.enPh;
+      if(val !== undefined) el.setAttribute('placeholder', val);
+    });
+    document.getElementById('viewTitle').textContent = titles[currentView][currentLang][0];
+    document.getElementById('viewSub').textContent = titles[currentView][currentLang][1];
+    document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active', b.dataset.lang===currentLang));
+  }
+
+  document.querySelectorAll('.lang-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{ currentLang = btn.dataset.lang; applyLanguage(); });
+  });
+
+  const defaultView = {document:'chat', activity:'log'};
+
+  function applyRoleVisibility(){
+    document.querySelectorAll('[data-roles]').forEach(el=>{
+      const roles = el.dataset.roles.split(',');
+      el.classList.toggle('r-hidden', !roles.includes(currentRole));
+    });
+    const activeNav = document.querySelector('.module-nav[data-module="'+currentModule+'"] .nav-item.active');
+    if(activeNav && activeNav.classList.contains('r-hidden')){
+      switchView(defaultView[currentModule]);
+    }
+  }
+
+  function switchModule(mod){
+    currentModule = mod;
+    document.querySelectorAll('.module-btn').forEach(b=>b.classList.toggle('active', b.dataset.module===mod));
+    document.querySelectorAll('.module-nav').forEach(n=>{
+      n.style.display = n.dataset.module === mod ? 'flex' : 'none';
+    });
+    switchView(defaultView[mod]);
+    applyRoleVisibility();
+  }
+
+  function switchView(key){
+    document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+    const nav = document.querySelector('.nav-item[data-view="'+key+'"]');
+    if(nav) nav.classList.add('active');
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    const v = document.getElementById('view-'+key);
+    if(v) v.classList.add('active');
+    currentView = key;
+    document.getElementById('viewTitle').textContent = titles[currentView][currentLang][0];
+    document.getElementById('viewSub').textContent = titles[currentView][currentLang][1];
+  }
+
+  document.querySelectorAll('.module-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=> switchModule(btn.dataset.module));
+  });
+
+  document.querySelectorAll('.nav-item').forEach(item=>{
+    item.addEventListener('click', ()=> switchView(item.dataset.view));
+  });
+
+  // ---- Topic search dropdown ----
+  const topicInput = document.getElementById('topicSearchInput');
+  const topicDropdown = document.getElementById('topicDropdown');
+  const topicOptions = Array.from(document.querySelectorAll('.topic-option'));
+  const topicEmpty = document.getElementById('topicEmpty');
+  const hintStakeholder = document.getElementById('hintStakeholder');
+  const hintProject = document.getElementById('hintProject');
+
+  function selectTopic(opt){
+    topicInput.value = opt.dataset.name;
+    const stakeholderTxt = { vi:'Stakeholder: '+opt.dataset.stakeholder, en:'Stakeholder: '+opt.dataset.stakeholder };
+    const projectTxt = { vi:'Project: '+opt.dataset.project, en:'Project: '+opt.dataset.project };
+    hintStakeholder.dataset.vi = stakeholderTxt.vi; hintStakeholder.dataset.en = stakeholderTxt.en;
+    hintProject.dataset.vi = projectTxt.vi; hintProject.dataset.en = projectTxt.en;
+    hintStakeholder.textContent = stakeholderTxt[currentLang];
+    hintProject.textContent = projectTxt[currentLang];
+    topicDropdown.classList.remove('open');
+  }
+
+  function filterTopics(){
+    const q = topicInput.value.trim().toLowerCase();
+    let anyVisible = false;
+    topicOptions.forEach(opt=>{
+      const hay = (opt.dataset.name+' '+opt.dataset.stakeholder+' '+opt.dataset.project).toLowerCase();
+      const match = hay.includes(q);
+      opt.style.display = match ? 'block' : 'none';
+      if(match) anyVisible = true;
+    });
+    topicEmpty.style.display = anyVisible ? 'none' : 'block';
+  }
+
+  topicInput.addEventListener('focus', ()=>{ filterTopics(); topicDropdown.classList.add('open'); });
+  topicInput.addEventListener('input', ()=>{ filterTopics(); topicDropdown.classList.add('open'); });
+  topicOptions.forEach(opt=>{
+    opt.addEventListener('click', ()=> selectTopic(opt));
+  });
+  document.addEventListener('click', (e)=>{
+    if(!document.getElementById('topicSearchWrap').contains(e.target)){
+      topicDropdown.classList.remove('open');
+    }
+  });
+
+  // ---- Daily hour summary ----
+  const DAILY_TARGET_HOURS = 8;
+  let hourTotal = 4.5;
+
+  function updateHourSummary(){
+    const el = document.getElementById('hourSummary');
+    const tag = document.getElementById('hourTag');
+    const val = document.getElementById('hourValue');
+    const fill = document.getElementById('hourBarFill');
+
+    val.textContent = hourTotal.toFixed(1) + ' / ' + DAILY_TARGET_HOURS.toFixed(1) + 'h';
+    fill.style.width = Math.min(100, (hourTotal / DAILY_TARGET_HOURS) * 100) + '%';
+
+    el.classList.remove('hour-under','hour-over','hour-ok');
+    tag.classList.remove('hour-under','hour-over','hour-ok');
+    let state, viTxt, enTxt;
+    if (Math.abs(hourTotal - DAILY_TARGET_HOURS) < 0.01) { state='hour-ok'; viTxt='Đủ giờ'; enTxt='On target'; }
+    else if (hourTotal < DAILY_TARGET_HOURS) { state='hour-under'; viTxt='Thiếu giờ'; enTxt='Under target'; }
+    else { state='hour-over'; viTxt='Vượt giờ'; enTxt='Over target'; }
+    el.classList.add(state);
+    tag.classList.add(state);
+    tag.dataset.vi = viTxt; tag.dataset.en = enTxt;
+    tag.textContent = currentLang === 'vi' ? viTxt : enTxt;
+  }
+
+  // ---- Save log: đọc cả 3 mục Progress/Blocker/Note cùng lúc ----
+  document.getElementById('saveLogBtn').addEventListener('click', ()=>{
+    const topic = topicInput.value;
+    const hrRaw = parseFloat(document.getElementById('hourInput').value);
+    const hr = isNaN(hrRaw) ? 0 : Math.round(hrRaw * 10) / 10;
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2,'0');
+    const mm = String(now.getMinutes()).padStart(2,'0');
+
+    const fields = [
+      { el: document.getElementById('progressText'), typeVi:'Progress', badge:'badge-progress' },
+      { el: document.getElementById('blockerText'),  typeVi:'Blocker',  badge:'badge-blocker' },
+      { el: document.getElementById('noteText'),     typeVi:'Note',     badge:'badge-note' }
+    ];
+
+    let firstEntry = true;
+    let createdAny = false;
+    fields.forEach(f=>{
+      const text = f.el.value.trim();
+      if(!text) return;
+      createdAny = true;
+      const hrTag = firstEntry ? ' <span class="hr">'+hr.toFixed(1)+'h</span>' : '';
+      firstEntry = false;
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      entry.innerHTML = '<div class="meta"><span class="entry-badge '+f.badge+'">'+f.typeVi+'</span>'+topic+' · '+hh+':'+mm+hrTag+'</div><span>'+text+'</span>';
+      document.getElementById('logEntriesList').prepend(entry);
+      f.el.value = '';
+    });
+
+    if(!createdAny) return; // không có mục nào điền thì không lưu
+
+    hourTotal = Math.round((hourTotal + hr) * 10) / 10;
+    updateHourSummary();
+  });
+
+  updateHourSummary();
+
+  // ---- Goal tuần tới: theo Project, chọn nhiều Topic, chọn tuần ----
+  const projectTopics = {
+    'Risk Dashboard Revamp': ['Risk Dashboard — Data pipeline', 'Risk Dashboard — Report automation'],
+    'EXCO Reporting Automation': ['EXCO Auto-report'],
+    'Migrate Data Lake': ['Data Lake Migration — Fin tables'],
+    'Cost Allocation Model': ['Cost Allocation Model refresh']
+  };
+
+  const sampleGoalsByWeek = {
+    'Tuần 03/08 – 09/08/2026': {
+      'Risk Dashboard Revamp': [
+        { topics:['Risk Dashboard — Data pipeline'], vi:'Hoàn thành QA pipeline và demo thử cho Risk Committee.', en:'Finish pipeline QA and run a trial demo for Risk Committee.' }
+      ],
+      'EXCO Reporting Automation': [
+        { topics:['EXCO Auto-report'], vi:'Xin quyền đọc Power BI Service từ IT, hoàn thành trong tuần.', en:'Get Power BI Service read access approved by IT this week.' }
+      ]
+    },
+    'Tuần 27/07 – 02/08/2026': {},
+    'Tuần 10/08 – 16/08/2026': {}
+  };
+
+  const goalProjectSelect = document.getElementById('goalProjectSelect');
+  const topicChecklist = document.getElementById('topicChecklist');
+  const goalListByProject = document.getElementById('goalListByProject');
+  const weekSelect = document.getElementById('weekSelect');
+
+  function renderTopicChecklist(project){
+    const topics = projectTopics[project] || [];
+    topicChecklist.innerHTML = topics.map((t,i)=>
+      '<label class="topic-check-item"><input type="checkbox" value="'+t+'" checked>'+t+'</label>'
+    ).join('');
+  }
+
+  function renderGoalList(week){
+    const data = sampleGoalsByWeek[week] || {};
+    const projects = Object.keys(data);
+    if(projects.length === 0){
+      goalListByProject.innerHTML = '<div class="goal-empty-week" data-vi="Chưa có goal nào cho tuần này" data-en="No goals set for this week yet">Chưa có goal nào cho tuần này</div>';
+      applyLanguage();
+      return;
+    }
+    goalListByProject.innerHTML = projects.map(p=>{
+      const goals = data[p].map(g=>
+        '<div class="goal-card"><div class="goal-topics">'+
+        g.topics.map(t=>'<span class="cite"><span class="dot"></span>'+t+'</span>').join('')+
+        '</div><div class="goal-text-display" data-vi="'+g.vi+'" data-en="'+g.en+'">'+(currentLang==='vi'?g.vi:g.en)+'</div></div>'
+      ).join('');
+      return '<div class="goal-project-group" data-project="'+p+'"><div class="goal-project-title">'+p+'</div>'+goals+'</div>';
+    }).join('');
+  }
+
+  goalProjectSelect.addEventListener('change', ()=> renderTopicChecklist(goalProjectSelect.value));
+  weekSelect.addEventListener('change', ()=>{
+    if(!sampleGoalsByWeek[weekSelect.value]) sampleGoalsByWeek[weekSelect.value] = {};
+    renderGoalList(weekSelect.value);
+  });
+
+  document.getElementById('addGoalBtn').addEventListener('click', ()=>{
+    const project = goalProjectSelect.value;
+    const checked = Array.from(topicChecklist.querySelectorAll('input[type=checkbox]:checked')).map(c=>c.value);
+    const text = document.getElementById('goalTextInput').value.trim();
+    if(!text || checked.length === 0) return;
+
+    const week = weekSelect.value;
+    if(!sampleGoalsByWeek[week]) sampleGoalsByWeek[week] = {};
+    if(!sampleGoalsByWeek[week][project]) sampleGoalsByWeek[week][project] = [];
+    sampleGoalsByWeek[week][project].push({ topics:checked, vi:text, en:text });
+
+    document.getElementById('goalTextInput').value = '';
+    renderGoalList(week);
+  });
+
+  renderTopicChecklist(goalProjectSelect.value);
+  renderGoalList(weekSelect.value);
+
+  document.getElementById('toggleAddUser').addEventListener('click', ()=>{
+    const f = document.getElementById('addUserForm');
+    f.style.display = f.style.display === 'none' ? 'block' : 'none';
+  });
+
+  document.querySelectorAll('.demo-role-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      currentRole = btn.dataset.role;
+      const initials = btn.dataset.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      document.getElementById('curName').textContent = btn.dataset.name;
+      document.getElementById('curRole').textContent = roleLabel[currentRole] + ' · ' + btn.dataset.title;
+      document.getElementById('curAvatar').textContent = initials;
+      document.getElementById('screen-login').style.display = 'none';
+      document.getElementById('screen-app').style.display = 'grid';
+      switchModule('document');
+      applyLanguage();
+    });
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', ()=>{
+    document.getElementById('screen-app').style.display = 'none';
+    document.getElementById('screen-login').style.display = 'flex';
+  });
+
+  // ---- Đổi mật khẩu: link trên màn login (panel inline) ----
+  document.getElementById('openChangePw').addEventListener('click', (e)=>{
+    e.preventDefault();
+    const panel = document.getElementById('changePwPanel');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  });
+
+  // ---- Đổi mật khẩu: nút trong app (modal) ----
+  document.getElementById('openChangePwApp').addEventListener('click', ()=>{
+    document.getElementById('pwModalOverlay').style.display = 'flex';
+  });
+  document.getElementById('closePwModal').addEventListener('click', ()=>{
+    document.getElementById('pwModalOverlay').style.display = 'none';
+  });
+  document.getElementById('pwModalOverlay').addEventListener('click', (e)=>{
+    if(e.target.id === 'pwModalOverlay') document.getElementById('pwModalOverlay').style.display = 'none';
+  });
+
+  // ---- Insert Document: chọn cách nạp -> paste hoặc upload -> (upload) chọn generate method -> preview ----
+  const addDocForm = document.getElementById('addDocForm');
+  document.getElementById('toggleAddDoc').addEventListener('click', ()=>{
+    addDocForm.style.display = addDocForm.style.display === 'none' ? 'block' : 'none';
+  });
+
+  const pasteStep = document.getElementById('pasteStep');
+  const uploadStep = document.getElementById('uploadStep');
+
+  document.querySelectorAll('#docMethodRow .doc-method-card').forEach(card=>{
+    card.addEventListener('click', ()=>{
+      document.querySelectorAll('#docMethodRow .doc-method-card').forEach(c=>c.classList.remove('selected'));
+      card.classList.add('selected');
+      const method = card.dataset.method;
+      pasteStep.style.display = method === 'paste' ? 'block' : 'none';
+      uploadStep.style.display = method === 'upload' ? 'block' : 'none';
+      document.getElementById('generateMethodRow').style.display = 'none';
+      document.getElementById('genPreviewBlock').style.display = 'none';
+    });
+  });
+
+  document.getElementById('docFileInput').addEventListener('change', ()=>{
+    document.getElementById('generateMethodRow').style.display = 'grid';
+    document.getElementById('genPreviewBlock').style.display = 'none';
+  });
+
+  document.querySelectorAll('#generateMethodRow .doc-method-card').forEach(card=>{
+    card.addEventListener('click', ()=>{
+      document.querySelectorAll('#generateMethodRow .doc-method-card').forEach(c=>c.classList.remove('selected'));
+      card.classList.add('selected');
+      const method = card.dataset.genmethod;
+      const statusEl = document.getElementById('genStatusText');
+      const statusTxt = method === 'ai'
+        ? { vi:'✨ Đang convert bằng AI (Deepseek) — tốn token…', en:'✨ Converting via AI (Deepseek) — uses tokens…' }
+        : { vi:'⚙️ Đang convert bằng Script — không tốn token…', en:'⚙️ Converting via Script — no tokens used…' };
+      statusEl.dataset.vi = statusTxt.vi; statusEl.dataset.en = statusTxt.en;
+      statusEl.textContent = currentLang === 'vi' ? statusTxt.vi : statusTxt.en;
+
+      const fileName = (document.getElementById('docFileInput').files[0] || {}).name || 'document.docx';
+      document.getElementById('genPreviewText').value =
+        '# ' + fileName.replace(/\.[^/.]+$/, '') + '\n\n(Bản Markdown nháp do ' + (method==='ai' ? 'AI (Deepseek)' : 'Script Python') + ' convert — xem lại và chỉnh sửa trước khi gửi duyệt.)';
+
+      document.getElementById('genPreviewBlock').style.display = 'block';
+    });
+  });
+
+  document.getElementById('submitPasteBtn').addEventListener('click', ()=>{
+    addDocForm.style.display = 'none';
+    switchView('approval');
+  });
+  document.getElementById('submitUploadBtn').addEventListener('click', ()=>{
+    addDocForm.style.display = 'none';
+    switchView('approval');
+  });
+  document.getElementById('regenBtn').addEventListener('click', ()=>{
+    document.getElementById('genPreviewBlock').style.display = 'none';
+    document.querySelectorAll('#generateMethodRow .doc-method-card').forEach(c=>c.classList.remove('selected'));
+  });
+</script>
+</body>
+</html>

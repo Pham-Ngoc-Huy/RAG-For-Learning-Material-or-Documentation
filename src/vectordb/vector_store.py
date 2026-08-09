@@ -11,6 +11,7 @@ from qdrant_client.models import (
     Filter,
     FieldCondition,
     MatchValue,
+    FilterSelector,
 )
 
 
@@ -90,6 +91,36 @@ class BaseVectorStore(ABC):
         @objective Remove tenant data without affecting other tenants.
         @update date 2026-08-03
         @commented by Huy Pham
+        """
+        pass
+
+    @abstractmethod
+    def list_chunks(
+        self,
+        user_id: str,
+        collection_name: Optional[str] = None,
+    ) -> list[dict]:
+        """
+        @brief List all stored chunks (id + payload) for a tenant.
+        @param user_id: tenant identifier for multi-tenant isolation
+        @param collection_name: optional custom collection suffix
+        @objective Allow the caller to enumerate ingested documents without vectors.
+        """
+        pass
+
+    @abstractmethod
+    def delete_by_source(
+        self,
+        user_id: str,
+        source: str,
+        collection_name: Optional[str] = None,
+    ) -> None:
+        """
+        @brief Delete all chunks belonging to one source document for a tenant.
+        @param user_id: tenant identifier for multi-tenant isolation
+        @param source: the document's source filename to remove
+        @param collection_name: optional custom collection suffix
+        @objective Remove a single ingested document without affecting others.
         """
         pass
 
@@ -284,6 +315,39 @@ class QdrantVectorStore(BaseVectorStore):
             for hit in results.points
         ]
 
+    def list_chunks(
+        self,
+        user_id: str,
+        collection_name: Optional[str] = None,
+    ) -> list[dict]:
+        collection = self._collection_name(user_id, collection_name)
+        try:
+            self.client.get_collection(collection_name=collection)
+        except Exception:
+            return []
+
+        points, _ = self.client.scroll(
+            collection_name=collection,
+            scroll_filter=self._build_user_filter(user_id=user_id),
+            limit=10_000,
+            with_payload=True,
+            with_vectors=False,
+        )
+        return [{"id": point.id, "payload": point.payload} for point in points]
+
+    def delete_by_source(
+        self,
+        user_id: str,
+        source: str,
+        collection_name: Optional[str] = None,
+    ) -> None:
+        collection = self._collection_name(user_id, collection_name)
+        query_filter = self._build_user_filter(
+            user_id=user_id,
+            metadata_filter=Filter(must=[FieldCondition(key="source", match=MatchValue(value=source))]),
+        )
+        self.client.delete(collection_name=collection, points_selector=FilterSelector(filter=query_filter))
+
     def delete_user_data(
         self,
         user_id: str,
@@ -291,7 +355,7 @@ class QdrantVectorStore(BaseVectorStore):
     ) -> None:
         collection = self._collection_name(user_id, collection_name)
         query_filter = self._build_user_filter(user_id=user_id)
-        self.client.delete(collection_name=collection, filter=query_filter)
+        self.client.delete(collection_name=collection, points_selector=FilterSelector(filter=query_filter))
 
     def delete_collection(
         self,
