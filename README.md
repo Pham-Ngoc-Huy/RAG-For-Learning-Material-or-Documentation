@@ -51,42 +51,44 @@ flowchart TD
 
 **New-Insight: We can use model from Gemini for better OCR -> from jpg or png to text** (Havent in production yet)
 
-!!! note "Loader"
+> [!NOTE]
+> **Loader**
+>
+> **File destination:** `/ingestion/loader.py`
+>
+> **Input:** `file_path` or `user-input-file`
+>
+> **Process:**
+> 1. Recieve Input of Users (File-Path, File-Name, URL)
+> 2. Recognize the suffix-extension of the file-type (`.pdf`, `.txt`, `.csv`, `.png`, ...)
+> 3. Using the libraries to convert all-types into `.md` file (MarkItDown, pdf-inspector, ocr-libs [future consideration])
+> 4. Save the text into `output-scheme` and **output-file into output-directory**
+>
+> **Output:**
+> - **Datatype:** `Struct`
+> - **Output Scheme:**
+>
+> ```json
+> {
+>   "text": text,
+>   "metadata": {
+>     "source": source,
+>     "file_path": file_path,
+>     "file_type": file_type,
+>     "loaded_at": load_time
+>   }
+> }
+> ```
 
-    **File destination:** `/ingestion/loader.py`
+**Example**
 
-    **Input:** `file_path` or `user-input-file`
+```python
+# create main.py 
+from ingestion import FileLoader
+file_path='file_path' # put path to file here
 
-    **Process:** 
-    1. Recieve Input of Users (File-Path, File-Name, URL)
-    2. Recognize the suffix-extension of the file-type (`.pdf`, `.txt`, `.csv`, `.png`, ...)
-    3. Using the libraries to convert all-types into `.md` file (MarkItDown, pdf-inspector, ocr-libs [future consideration])
-    4. Save the text into `output-scheme` and **output-file into output-directory**
-
-    **Output:**
-
-    - **Datatype:** `Struct`
-    - **Output Scheme:**
-
-      ```json
-      {
-        "text": text,
-        "metadata": {
-          "source": source,
-          "file_path": file_path,
-          "file_type": file_type,
-          "loaded_at": load_time
-        }
-      }
-      ```
-!!! Example
-    ```python
-    # create main.py 
-    from ingestion import FileLoader
-    file_path='file_path' # put path to file here
-
-    output=FileLoader(file_path=file_path).load()
-    ```
+output=FileLoader(file_path=file_path).load()
+```
 ### 2.2. Chunking
 **Desription**
 > The **Chunking** stage splits the loaded document into smaller pieces called **chunks**. These chunks are used as context windows for retrieval from the vector database
@@ -95,64 +97,62 @@ It will have 2 variable fixed `DEFAULT CHUNK SIZE` and `DEFAULT CHUNK OVERLAP`
 - `DEFAULT CHUNK SIZE`: define the maximum number of characters contained in a single chunk
 - `DEFAULT CHUNK OVERLAP`: define the number of characters shared between two consecutive chunks
 
-!!! Example
-    
-    DEFAULT_CHUNK_SIZE = 1000
-    DEFAULT_CHUNK_OVERLAP = 200
+**Example**
 
-    The chunks will conceptually look like:
-    ```
-    Chunk 1: [---------------------------------]
-                1000 characters
+DEFAULT_CHUNK_SIZE = 1000
+DEFAULT_CHUNK_OVERLAP = 200
 
-    Chunk 2:                [--------------------------------
-                            1000 characteres
-                            <------ 200 - character overlap ------->
-    
-    Chunk 3: 
-                                            [---------------------
-                                            1000 characters
-    ```
+The chunks will conceptually look like:
+
+```
+Chunk 1: [---------------------------------]
+            1000 characters
+
+Chunk 2:                [--------------------------------
+                        1000 characters
+                        <------ 200 - character overlap ------->
+
+Chunk 3: 
+                                        [---------------------
+                                        1000 characters
+```
 
 **Note**: The overlap helps preserve contextual information between adjacent chunks and reduces the risk of losing important information at chunk boundaries
 
-!!! note "Loader"
-
-    **File destination:** `/chunking/chunker.py`
-
-    **Input:** `doc` with `dictionary` datatype
-
-    **Process:** 
-    1. Receive the `text` and `metadata` from the Loader output.
-    2. Select a chunking strategy based on the document structure:
-    - **Fixed-Size Chunking:** Split text based on a fixed character/token limit.
-    - **Recursive Chunking:** Split text using hierarchical separators such as paragraphs, newlines, sentences, and words.
-    - **Markdown Chunking:** Split Markdown documents by headers first, then `recursively chunk` sections that exceed the configured chunk size.
-    3. Apply `DEFAULT_CHUNK_SIZE` and `DEFAULT_CHUNK_OVERLAP` to control the size of each chunk and preserve contextual information between consecutive chunks.
-    4. Generate metadata for each chunk, including the original document metadata, `chunk_index`, and `total_chunk`.
-    5. Return a list of chunk objects containing the chunked `text` and its corresponding `metadata`.
-
-    **Output:**
-
-    - **Datatype:** `Struct`
-    - **Output Scheme:**
-
-      ```json
-      {
-        "text": text,
-        "metadata": {
-            # this is information from metadata (from function _build_chunk_metadata)
-            "source": source,
-            "file_path": file_path,
-            "file_type": file_type,
-            "loaded_at": load_time,
-
-            # this is information from chunking (chunk)
-            "chunk_index": chunk_index, # enumerate - index from chunks_loop 
-            "total_chunk": total_chunk  # len(chunks)
-        }
-      }
-      ```
+> [!NOTE]
+> **Loader**
+>
+> **File destination:** `/chunking/chunker.py`
+>
+> **Input:** `doc` with `dictionary` datatype
+>
+> **Process:**
+> 1. Receive the `text` and `metadata` from the Loader output.
+> 2. Select a chunking strategy based on the document structure:
+>    - **Fixed-Size Chunking:** Split text based on a fixed character/token limit.
+>    - **Recursive Chunking:** Split text using hierarchical separators such as paragraphs, newlines, sentences, and words.
+>    - **Markdown Chunking:** Split Markdown documents by headers first, then `recursively chunk` sections that exceed the configured chunk size.
+> 3. Apply `DEFAULT_CHUNK_SIZE` and `DEFAULT_CHUNK_OVERLAP` to control the size of each chunk and preserve contextual information between consecutive chunks.
+> 4. Generate metadata for each chunk, including the original document metadata, `chunk_index`, and `total_chunk`.
+> 5. Return a list of chunk objects containing the chunked `text` and its corresponding `metadata`.
+>
+> **Output:**
+> - **Datatype:** `Struct`
+> - **Output Scheme:**
+>
+> ```json
+> {
+>   "text": text,
+>   "metadata": {
+>     "source": source,
+>     "file_path": file_path,
+>     "file_type": file_type,
+>     "loaded_at": load_time,
+>     "chunk_index": chunk_index,
+>     "total_chunk": total_chunk
+>   }
+> }
+> ```
 
 
 # References:
