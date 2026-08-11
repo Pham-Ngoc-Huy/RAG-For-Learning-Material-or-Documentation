@@ -6,6 +6,7 @@ import re
 DEFAULT_CHUNK_SIZE = 512
 # overlap between consecutive chunks
 DEFAULT_CHUNK_OVERLAP = 50
+
 class BaseChunker(ABC):
     def __init__(
         self, 
