@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAG For Learning Material or Documentation</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark">R</span>
+      <div class="brand-title">RAG For Learning<br>Material or Documentation</div>
+    </div>
+    <div class="brand-tagline" data-i18n="tagline"></div>
+
+    <nav class="nav">
+      <button class="nav-item active" data-tab="chat">
+        <span class="nav-icon">✎</span><span data-i18n="navChat"></span>
+      </button>
+      <button class="nav-item" data-tab="kb">
+        <span class="nav-icon">▤</span><span data-i18n="navKb"></span>
+      </button>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="picker-group">
+        <div class="picker-label" data-i18n="themeLabel"></div>
+        <div class="picker-row" id="themeRow">
+          <button class="swatch swatch-light" data-theme="light" title="Light"></button>
+          <button class="swatch swatch-dark" data-theme="dark" title="Dark"></button>
+          <button class="swatch swatch-sakura" data-theme="sakura" title="Sakura"></button>
+          <button class="swatch swatch-lavender" data-theme="lavender" title="Lavender"></button>
+        </div>
+      </div>
+
+      <div class="picker-group">
+        <div class="picker-label" data-i18n="langLabel"></div>
+        <div class="picker-row lang-row" id="langRow">
+          <button class="lang-btn" data-lang="en">EN</button>
+          <button class="lang-btn" data-lang="vi">VI</button>
+        </div>
+      </div>
+
+      <div class="model-tag" id="footerModel">—</div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="view-title" id="viewTitle"></div>
+      <div class="view-sub" id="viewSub"></div>
+    </header>
+
+    <main class="content">
+
+      <!-- ===================== CHAT VIEW ===================== -->
+      <section class="view active" id="view-chat">
+        <div class="chat-shell">
+          <div class="thread" id="thread">
+            <div class="empty-state" id="chatEmpty">
+              <div class="empty-icon">◆</div>
+              <div class="empty-title" data-i18n="chatEmptyTitle"></div>
+              <div class="empty-sub" data-i18n="chatEmptySub"></div>
+            </div>
+          </div>
+
+          <form class="composer" id="composerForm">
+            <textarea
+              id="composerInput"
+              rows="1"
+              autocomplete="off"
+            ></textarea>
+            <button type="submit" class="send-btn" id="sendBtn">
+              <span class="send-label" data-i18n="send"></span>
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- ===================== KNOWLEDGE BASE VIEW ===================== -->
+      <section class="view" id="view-kb">
+        <div class="kb-shell">
+          <div class="kb-upload" id="dropZone">
+            <input type="file" id="fileInput" hidden accept=".pdf,.docx,.pptx,.xlsx,.html,.htm,.txt,.md,.jpg,.jpeg,.png">
+            <div class="kb-upload-icon">↑</div>
+            <div class="kb-upload-title">
+              <span data-i18n="kbUploadTitle"></span><span class="link" id="browseLink" data-i18n="kbUploadLink"></span>
+            </div>
+            <div class="kb-upload-sub" data-i18n="kbUploadSub"></div>
+          </div>
+
+          <div class="kb-status" id="kbStatus"></div>
+
+          <div class="kb-list-head">
+            <h3 data-i18n="kbListHead"></h3>
+            <span class="kb-count" id="kbCount">0</span>
+          </div>
+
+          <div class="kb-list" id="kbList">
+            <div class="empty-state small" id="kbEmpty">
+              <div class="empty-icon">◇</div>
+              <div class="empty-title" data-i18n="kbEmptyTitle"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<template id="tpl-question">
+  <div class="q-bubble"></div>
+</template>
+
+<template id="tpl-answer">
+  <div class="a-card">
+    <div class="a-eyebrow"></div>
+    <div class="a-text"></div>
+    <div class="cite-row"></div>
+  </div>
+</template>
+
+<template id="tpl-pending">
+  <div class="a-card pending">
+    <div class="a-eyebrow"></div>
+    <div class="typing"><span></span><span></span><span></span></div>
+  </div>
+</template>
+
+<template id="tpl-doc-row">
+  <div class="doc-row">
+    <div class="doc-icon">▤</div>
+    <div class="doc-info">
+      <div class="doc-name"></div>
+      <div class="doc-meta"></div>
+    </div>
+    <button class="doc-delete" title="Delete">×</button>
+  </div>
+</template>
+
+<script src="/app.js"></script>
+</body>
+</html>

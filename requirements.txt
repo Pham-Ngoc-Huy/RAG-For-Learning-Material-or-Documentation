@@ -4,3 +4,6 @@ requests
 sentence-transformers
 numpy
 qdrant-client
+fastapi
+uvicorn
+python-multipart

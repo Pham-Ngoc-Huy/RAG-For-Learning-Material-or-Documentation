@@ -154,6 +154,10 @@ Chunk 3:
 > }
 > ```
 
+### 2.3. VectorDB (Vector Store)
+**Description**
+
+
 
 # References:
 ## [1] MarkItDown - Repo [Turn file-format to .md file]
@@ -164,3 +168,5 @@ Chunk 3:
 
 ## [3] pdf_inspector - Repo [99% valid-rate from turning `.pdf` to `markdown-file`]
 !!!url https://github.com/firecrawl/pdf-inspector
+
+## [4] Unlimited OCR (near future add-in)
