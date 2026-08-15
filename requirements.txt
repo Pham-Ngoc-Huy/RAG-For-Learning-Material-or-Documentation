@@ -10,3 +10,7 @@ uvicorn>=0.52.3
 python-multipart>=0.0.32
 aiofiles>=23.1.0
 requests>=2.31.0
+OmegaConf
+yaml
+torch
+pyyaml

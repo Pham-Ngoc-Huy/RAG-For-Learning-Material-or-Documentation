@@ -13,7 +13,6 @@ from qdrant_client.models import (
     MatchValue,
 )
 
-
 class BaseVectorStore(ABC):
     @abstractmethod
     def create_collection(
@@ -111,20 +110,14 @@ class BaseVectorStore(ABC):
 
 
 class QdrantVectorStore(BaseVectorStore):
-    DEFAULT_COLLECTION = "documents"
-
     def __init__(
         self,
-        host: str = "localhost",
-        port: int = 5000,
         api_key: Optional[str] = None,
-        url: Optional[str] = None,
+        endpoint: Optional[str] = None,
         prefer_grpc: bool = False,
     ):
         """
         @brief Initialize a Qdrant-backed vector store client.
-        @param host: Qdrant host when URL is not provided
-        @param port: Qdrant port when URL is not provided
         @param api_key: optional Qdrant API key
         @param url: optional full Qdrant URL, overrides host/port
         @param prefer_grpc: whether to use the Qdrant gRPC transport
@@ -132,11 +125,19 @@ class QdrantVectorStore(BaseVectorStore):
         @update date 2026-08-05
         @commented by Huy Pham
         """
-        env_url = os.getenv("QDRANT_ENDPOINT")
-        resolved_api_key = os.getenv("QDRANT_API_KEY")
-        self.client = QdrantClient(url=env_url, api_key=resolved_api_key, prefer_grpc=prefer_grpc)
+        self.endpoint=endpoint
+        self.api_key=api_key
+        self.client = QdrantClient(
+            url=self.endpoint, 
+            api_key=self.api_key, 
+            prefer_grpc=prefer_grpc
+        )
 
-    def _collection_name(self, user_id: str, collection_name: Optional[str] = None) -> str:
+    def _collection_name(
+        self, 
+        user_id: str, 
+        collection_name: Optional[str] = None
+    ) -> str:
         """
         @brief Compute a tenant-isolated collection name.
         @param user_id: tenant identifier
@@ -149,7 +150,7 @@ class QdrantVectorStore(BaseVectorStore):
             raise ValueError("user_id must be provided")
 
         safe_user_id = str(user_id).strip().replace(" ", "_")
-        suffix = collection_name or self.DEFAULT_COLLECTION
+        suffix = collection_name
         return f"user_{safe_user_id}_{suffix}"
 
     def _build_user_filter(

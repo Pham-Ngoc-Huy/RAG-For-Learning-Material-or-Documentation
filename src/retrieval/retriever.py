@@ -1,8 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Optional
-
 from qdrant_client.models import Filter
-
 from src.embeddings.embedder import BaseEmbedder
 from src.vectordb.vector_store import BaseVectorStore
 
