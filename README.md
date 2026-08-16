@@ -155,102 +155,104 @@ Chunk 3:
 > ```
 
 ### 2.3. VectorDB (Vector Store)
+
 **Description**
->**Vector store (VectorDB)** stores embeddings (`fixed-dimension vectors`) and associated metadata for fast semantic retrieval. In this project `Qdrant` is the recommended store; other providers (Pinecone, Milvus, etc.) can be used with an adapter.
 
-**Note:**
-    - Keep **VECTOR_DIM** consistent with the embedding model to avoid errors
-    - Use chunk ids stable across re-ingestion to avoid duplicates
-    - Consider sharding/collections per-tenant for multi-tenancy
+> The **Vector Store** is responsible for storing document embeddings and their ssociated metadata so that relevant chunks can be retrieved efficiently during the RAG process.
+>
+> In this project, **Qdrant** is used as the vector database. The implementation provides a provider-independent `BaseVectorStore` interface and a `QdrantVectorStore` implementation.
+>
+> The Vector Store also supports **tenant isolation**, where each `user_id` receives an isolated collection and all search/delete operations are scoped to that user.
 
->[!NOTE]
-> **Vector-Store**
+> [!NOTE]
+> **Vector Store**
 >
-> **File destination**
->   - `/vectordb/manager.py`  (wrapper around provider client)
->   - `/ingestion/` -> produces chunk objects to be inserted
+> **File destination:**
+> - `/vectordb/vector_store.py`
 >
-> **Config / Environment (Input)**
->   - QDRANT_URL: URL to the Qdrant instance
->   - QDRANT_API_KEY: API key if hosted (optional)
->   - VECTORDB_COLLECTION: default collection name, e.g. "rag_docs"
->   - VECTOR_DIM: integer embedding dimension (must match embedding model)
->   - DISTANCE: similarity metric, e.g. "Cosine" or "Dot" or "Euclid"
+> **Input:**
+> - `chunks`: list of chunk objects produced by the Chunking stage
+> - `user_id`: identifier used for tenant isolation
+> - `query_vector`: embedding vector generated from the user's query (_this is for searching function_)
 >
-> **Schema / Metadata**
-> Each vector entry should include:
->   - id: stable id for the chunk (string)
->   - vector: embedding (list[float])
->   - payload / metadata: dictionary containing
->       - source: original file or URL
->       - file_path: path in storage
->       - chunk_index: integer
->       - total_chunks: integer
->       - loaded_at: iso timestamp
->       - any custom tags (e.g., topic, language)
+> **Configuration / Environment:**
+> - `QDRANT_URL`: URL of the Qdrant instance
+> - `QDRANT_API_KEY`: API key for hosted Qdrant (optional)
+> - `VECTOR_DIM`: dimension of the embedding vector
+> - `DISTANCE`: similarity metric used by Qdrant, e.g. `Cosine`, `Dot`, or `Euclid` (in this project we use COSINE DISTANCE)
 >
-> **Process**
->   1. Receive chunk objects from ingestion: {text, metadata}
->   2. Compute embedding using chosen model (ensure VECTOR_DIM)
->   3. Upsert vectors and metadata into collection
->   4. Provide a Retriever API that accepts query embeddings and returns top-k chunks
+> **Process:**
+> 1. Receive chunk objects from the Chunking stage.
+> 2. Create or retrieve a Qdrant collection for the corresponding `user_id`.
+> 3. Validate that each chunk contains an embedding vector.
+> 4. Store the embedding together with the chunk text and metadata.
+> 5. Attach `user_id` to the payload to enforce tenant isolation.
+> 6. Provide a similarity-search interface for retrieving the most relevant chunks.
+> 7. Support deletion of either all data belonging to a user or the user's
+>    entire collection.
 >
->**Example**
->```python
+> **Output:**
+> - **Datatype:** `List[Dict]`
+> - **Output Scheme:**
 >
->    from qdrant_client import QdrantClient
->    from qdrant_client.http import models
->
->    client = QdrantClient(url=os.getenv("QDRANT_URL"), api_key=os.getenv("QDRANT_API_KEY"))
->    collection = os.getenv("VECTORDB_COLLECTION", "rag_docs")
->
->    # create collection if not exists
->    client.recreate_collection(
->        collection_name=collection,
->        vectors_config=models.VectorParams(size=int(os.getenv("VECTOR_DIM", 1536)), distance=models.Distance.COSINE),
->    )
->
->   # upsert a single chunk
->    point = models.PointStruct(
->        id="doc1-chunk-0",
->        vector=embedding,  # list[float]
->        payload={
->            "source": "file.pdf",
->            "file_path": "/data/file.pdf",
->            "chunk_index": 0,
->            "total_chunks": 10,
->            "text": chunk_text,
->        },
->    )
->    client.upsert(collection_name=collection, points=[point])
->
->   #search
->   results = client.search(collection_name=collection, query_vector=query_embedding, limit=5)
->   for res in results:
->       print(res.id, res.payload.get("file_path"), res.score)
-> 
->```
->
-> **Retriever contract**
-> Expose a simple Retriever interface:
->   - build_index(chunks: List[Chunk]) -> None
->   - query(query_text: str, top_k: int = 5) -> List[Chunk]
->
-_**Implementation should handle batching upserts, retries, and backoff for network errors.**_
+> ```json
+> {
+>   "id": "doc1-chunk-0",
+>   "score": 0.9234,
+>   "payload": {
+>     "text": "chunk text",
+>     "source": "file.pdf",
+>     "file_path": "/data/file.pdf",
+>     "file_type": "pdf",
+>     "chunk_index": 0,
+>     "total_chunk": 10,
+>     "loaded_at": "2026-08-03T10:00:00",
+>     "user_id": "student_001"
+>   }
+> }
+> ```
 
+**Vector Store Architecture**
+The Vector Store is implemented using an abstract interface so that the underlying vector database can be replaced without changing the RAG pipeline.
 
-# References:
-## [1] MarkItDown - Repo [Turn file-format to .md file]
-!!! url 
-    https://github.com/microsoft/markitdown
+```mermaid
+flowchart LR
+    C["Chunking Stage<br/><br/>text + metadata"]
+        --> E["Embedding Model<br/><br/>text → vector"]
 
-## [2] Qdrant: Vector Database - Repo [store and embedded the data]
-!!!url 
-    https://github.com/qdrant/qdrant 
-    https://qdrant.tech/documentation/clients/python/
+    E --> B["BaseVectorStore<br/><br/>
+        create_collection()<br/>
+        upsert()<br/>
+        search()<br/>
+        delete_user_data()<br/>
+        delete_collection()"]
 
-## [3] pdf_inspector - Repo [99% valid-rate from turning `.pdf` to `markdown-file`]
-!!!url 
-    https://github.com/firecrawl/pdf-inspector
+    B --> Q["QdrantVectorStore<br/><br/>Qdrant"]
+```
+# References
 
-## [4] Unlimited OCR (near future add-in)
+## [1] MarkItDown — Repo
+> Turn file formats into `.md` files.
+>
+> **URL:** https://github.com/microsoft/markitdown
+
+## [2] Qdrant — Vector Database
+> Store and embed vector data.
+>
+> **Repository:** https://github.com/qdrant/qdrant  
+> **Python Client Documentation:** https://qdrant.tech/documentation/clients/python/
+
+## [3] pdf_inspector — Repo
+> 99% valid-rate for converting `.pdf` files to Markdown.
+>
+> **URL:** https://github.com/firecrawl/pdf-inspector
+
+## [4] PaddleOCR — OCR Engine
+> Near-future add-in for OCR processing of scanned/image-based documents.
+>
+> **URL:** https://github.com/PaddlePaddle/PaddleOCR
+## [5] Unlimited OCR [Near future add-in]
+> [!NOTE]
+> OCR support for scanned PDFs and image-based documents.
+> Planned as a fallback when MarkItDown / pdf_inspector cannot
+> extract the document content reliably.
