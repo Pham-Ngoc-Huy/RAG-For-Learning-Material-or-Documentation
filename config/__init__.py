@@ -1,9 +1,11 @@
 from .config_loader import (
     ConfigConstructor,
-    OmegaConfigLoader
+    OmegaConfigLoader,
+    NormalLoader
 )
 
 __all__ = [
     "ConfigConstructor",
-    "OmegaConfigLoader"
+    "OmegaConfigLoader",
+    "NormalLoader"
 ]

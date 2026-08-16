@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Dict, List, Union
-import yaml
+from config.config_loader import NormalLoader
 
 class PromptTemplate(ABC):
     """Abstract base class for prompt template implementations.
@@ -12,7 +12,11 @@ class PromptTemplate(ABC):
     @commented by Huy Pham
     """
     @abstractmethod
-    def build(self, template_name:str, **kwargs) -> List[Dict[str,str]]:
+    def build(
+        self, 
+        template_name:str, 
+        **kwargs
+    ) -> List[Dict[str,str]]:
         """Format the prompt template with provided keyword arguments.
 
         @brief Build the final prompt text.
@@ -22,7 +26,10 @@ class PromptTemplate(ABC):
         pass
 
 class PromptAssistance(PromptTemplate):
-    def __init__(self, prompts_dir: Union[str, Path] = "prompts"):
+    def __init__(
+        self, 
+        prompts_dir: Union[str, Path] = "src/prompts"
+    ):
         """
         @brief create PromptAssistance
         @param prompts_dir: template as yml (VD: 'prompts/')
@@ -32,28 +39,15 @@ class PromptAssistance(PromptTemplate):
         if not self.prompts_dir.exists() or not self.prompts_dir.is_dir():
             raise NotADirectoryError(f"TPrompts Root Not-Found: {self.prompts_dir.absolute()}")
 
-    def _load_yaml(self, template_name: str) -> dict:
-        """Read and Parse file YAML """
-        
-        if not template_name.endswith(('.yml', '.yaml')):
-            template_name += '.yaml'
-            
-        file_path = self.prompts_dir / template_name
-        
-        if not file_path.exists():
-            raise FileNotFoundError(f"Not-Found: {file_path}")
-            
-        with open(file_path, 'r', encoding='utf-8') as file:
-            try:
-                return yaml.safe_load(file)
-            except yaml.YAMLError as e:
-                raise ValueError(f"Syntax error in file YAML '{template_name}': {e}")
+    def build(
+        self, 
+        template_name: str, 
+        **kwargs
+    ) -> List[Dict[str, str]]:
 
-    def build(self, template_name: str, **kwargs) -> List[Dict[str, str]]:
-
-        prompt_data = self._load_yaml(template_name)
+        prompt_data = NormalLoader(config_path=f"src/prompts/{template_name}.yml").load()
         messages = []
-
+        
         if "system_message" in prompt_data and prompt_data["system_message"]:
             system_content = prompt_data["system_message"]
             try:

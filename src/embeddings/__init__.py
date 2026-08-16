@@ -1,3 +1,9 @@
-from .embedder import SentenceTransformerEmbedder, OpenAIEmbedder, DeepSeeekEmbedder
+from .embedder import (
+    BaseEmbedder,
+    ModelEmbedder
+)
 
-__all__ = ["SentenceTransformerEmbedder", "OpenAIEmbedder", "DeepSeeekEmbedder"]
+__all__ = [
+    "BaseEmbedder", 
+    "ModelEmbedder"
+]

@@ -229,6 +229,8 @@ flowchart LR
 
     B --> Q["QdrantVectorStore<br/><br/>Qdrant"]
 ```
+
+### 2.4. Embedded
 # References
 
 ## [1] MarkItDown — Repo

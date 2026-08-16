@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any
 from omegaconf import DictConfig, OmegaConf
-
+import yaml
 class ConfigConstructor(ABC):
     def __init__(self, config_path: str = "config.yaml"):
         self.config_path = Path(config_path)
@@ -19,3 +19,11 @@ class OmegaConfigLoader(ConfigConstructor):
             override_config = OmegaConf.create(override)
             config = OmegaConf.merge(config, override_config)
         return config
+
+class NormalLoader(ConfigConstructor):
+    def load(self, **override: Any) -> DictConfig:
+        with open(self.config_path, 'r', encoding='utf-8') as file:
+            try:
+                return yaml.safe_load(file)
+            except yaml.YAMLError as e:
+                raise ValueError(f"Syntax error in file YAML '{self.config_path}': {e}")
