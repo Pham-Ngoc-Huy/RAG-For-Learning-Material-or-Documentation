@@ -19,6 +19,8 @@ dependencies = [
     "transformers>=5.14.1",
     "omegaconf>=2.3.1",
     "pyyaml>=6.0.3",
+    "ffmpeg>=1.4",
+    "python-dotenv>=1.0.0",
 ]
 
 [tool.vercel]

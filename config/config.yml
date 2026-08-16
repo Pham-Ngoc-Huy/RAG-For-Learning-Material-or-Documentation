@@ -4,13 +4,14 @@ vectordb:
     api_key:
 
 models:
-  
   deepseek:
-    api_key:
     embedded:
-      base_url: "https://opencode.ai/zen/v1"
-      model: "deepseek-v4-flash-free"
+      api_key:
+      # Hugging Face Model
+      base_url: "local" 
+      model: "all-MiniLM-L6-v2"
     llm_client:
+      api_key: 
       model: "~deepseek/deepseek-v4-flash-latest"
       base_url: "https://openrouter.ai/api/v1"
       max_tokens: 500 
