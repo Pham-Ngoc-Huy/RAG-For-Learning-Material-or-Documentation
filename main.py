@@ -40,23 +40,28 @@ class ConstructorLoops(ABC):
             base_url=self.base_url_embedded,
             api_key=self.api_key_embedded
         )
+
         self.dimensions = self.embedded.get_vectorspace_dimensions
 
         self.prompt_template = PromptAssistance()
+
         self.vector_store=QdrantVectorStore(
             api_key=self.api_key_vectordb,
             endpoint=self.base_url_vectordb
         )
+
         self.retriever = QdrantRetriever(
             vector_store=self.vector_store,
             embedder=self.embedded
         )
+
         self.llm_client=ThinkingFromKnowledgeBase(
             api_key=self.api_key_llm_client,
             base_url=self.base_url_llm_client,
             model=self.model_llm_client,
             provider=self.model
         )
+
     @abstractmethod 
     def query(
         self, 
@@ -86,9 +91,10 @@ class AskAndAnswer(ConstructorLoops):
 
         response=self.llm_client.generate(
             messages=messages,
-            max_tokens=500,
-            temperature=0.7
+            max_tokens=2000,
+            temperature=1.0
         )
+
         return response
 
 class QdrantCollection(ConstructorLoops):
@@ -107,10 +113,29 @@ class QdrantCollection(ConstructorLoops):
             user_id=self.user_id,
             collection_name=collection_name
         )
-    
+
+    def upsert(self, collection_name:str, chunks:dict):
+        return self.vector_store.upsert(
+            user_id=self.user_id,
+            collection_name=collection_name,
+            chunks=chunks
+        )
+
+# class 
+class Embedded(ConstructorLoops):
+    def query(self, text:str, collection_name:str) -> None:
+        pass
+
+    def embed_many(self, chunks: list[dict]) -> list[dict]:
+        return self.embedded.embed_many(chunks=chunks)
+
+    def embed_query(self, query:str) -> list[float]:
+        return self.embedded.embed_query(query=query)
+
 def main():
     load_dotenv()
     model_chosen = "deepseek"
+
     # load config
     config = OmegaConfigLoader(config_path="config/config.yml").load(
         vectordb={
@@ -129,18 +154,38 @@ def main():
             }
         }
     )
+
     user_id = 'huypham'
     collection_name = "AI"
     user_name = 'user_default_user_documents'
-    question = "Hello ! vectorDB là gì"
+    question = "Disturbance?"
+
+    file_path = "temp/Tutorial_NDO.pdf"
 
     # Create Collection
-    QdrantCollection(
+    qdrant_collection = QdrantCollection(
         config=config,
         user_id=user_id,
         user_name=user_name,
         model=model_chosen
-    ).create(collection_name=collection_name)
+    )
+
+    qdrant_collection.delete(collection_name=collection_name)
+    qdrant_collection.create(collection_name=collection_name)
+
+    # Chunks 
+    doc_result = FileLoader(file_path=file_path).load()
+    chunks = MarkDownChunker().chunk(doc=doc_result)
+
+    # Embedded
+    embedder = Embedded(
+        config=config,
+        user_id=user_id,
+        user_name=user_name,
+        model=model_chosen
+    )
+    chunks = embedder.embed_many(chunks=chunks)
+    qdrant_collection.upsert(collection_name=collection_name, chunks=chunks)
 
 
     rag_pipeline = AskAndAnswer(
@@ -152,7 +197,7 @@ def main():
     response = rag_pipeline.query(
         text=question,
         collection_name=collection_name
-    )   
+    )
     
     print("Repsonding: \n")
     print(response.text)

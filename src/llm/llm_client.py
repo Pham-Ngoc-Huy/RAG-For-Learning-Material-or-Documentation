@@ -65,8 +65,9 @@ class ThinkingFromKnowledgeBase(BaseLLMClient):
         max_tokens:int=500, 
         temperature:float=0.7
     ) -> LLMResponse:
-        if not prompt or not messages:
-            raise ValueError("Must provide either `prompt` or `messages`")
+        
+        # if not prompt or not messages:
+        #     raise ValueError("Must provide either `prompt` or `messages`")
 
         payload_messages = messages or  [
             {
@@ -86,16 +87,16 @@ class ThinkingFromKnowledgeBase(BaseLLMClient):
 
             return LLMResponse(
                 text=answer_text,
-                provider=self.provider_name,
+                provider=self.provider,
                 model=self.model,
-                raw_response=response.model_dump()
+                response=response.model_dump()
             )
 
         except Exception as e:
-            print(f"Error calling {self.provider_name}: {str(e)}")
+            print(f"Error calling {self.provider}: {str(e)}")
             return LLMResponse(
                 text=f"Error: {str(e)}",
-                provider=self.provider_name,
+                provider=self.provider,
                 model=self.model,
-                raw_response={}
+                response={}
             )
