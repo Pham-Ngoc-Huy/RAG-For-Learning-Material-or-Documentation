@@ -1,4 +1,3 @@
-import os
 import runpy
 from pathlib import Path
 
@@ -29,7 +28,10 @@ def test_main_pipeline_runs_with_patched_components(tmp_path, monkeypatch):
 
     monkeypatch.setattr("src.ingestion.loader.FileLoader.load", fake_load)
     monkeypatch.setattr("src.chunking.chunker.MarkDownChunker.chunk", fake_chunk)
-    monkeypatch.setattr("src.embeddings.embedder.SentenceTransformerEmbedder.embed_many", fake_embed_many)
+    monkeypatch.setattr(
+        "src.embeddings.embedder.SentenceTransformerEmbedder.embed_many",
+        fake_embed_many,
+    )
 
     repo_root = Path(__file__).resolve().parents[1]
     result = runpy.run_path(str(repo_root / "main.py"), run_name="__main__")

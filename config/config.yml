@@ -1,22 +1,22 @@
 vectordb:
   qdrant:
-    endpoint: 
+    endpoint:
     api_key:
 
 models:
-  deepseek:
+  openrouter:
     embedded:
       api_key:
       # Hugging Face Model
-      base_url: "local" 
+      base_url: "local"
       model: "all-MiniLM-L6-v2"
     llm_client:
-      api_key: 
+      api_key:
       model: "~deepseek/deepseek-v4-flash-latest"
       base_url: "https://openrouter.ai/api/v1"
-      max_tokens: 500 
+      max_tokens: 500
       temperature: 0.7
-  
+
   openai:
     api_key:
     embedded:
@@ -27,6 +27,3 @@ models:
       base_url:
       max_tokens:
       temperature:
-
-
-

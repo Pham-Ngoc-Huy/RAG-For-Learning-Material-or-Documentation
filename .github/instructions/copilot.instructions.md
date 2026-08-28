@@ -1,9 +1,11 @@
 # Context
+
 Retrieval Argument Generator (RAG-based Q&A) platform: users upload documents, ask questions against them,
 and the system surfaces relationships between documents. Multi-tenant — each user has an isolated knowledge
 base behind login/registration, with zero data overlap or overwrite between accounts.
 
 ## Architecture
+
 - Backend: Python (FastAPI/Flask), OOP with base classes and inheritance
   (e.g. `BaseRetriever` -> `QdrantRetriever`, `BaseGenerator` -> provider-specific implementations)
 - Multi-tenancy: each user gets an isolated collection/namespace in the vector store, keyed by user_id.
@@ -15,12 +17,14 @@ base behind login/registration, with zero data overlap or overwrite between acco
   conventions generic, not RAG-specific.
 
 ## Response requirements
+
 - Every answer must cite the source chunk/document (id + page/section if available)
 - If the question requires a calculation, show the equation (plain math notation or LaTeX) before the numeric result
 - If retrieved context doesn't support an answer, say so explicitly — never fill gaps from general knowledge
 - Structure every answer as: Objective → Process → Output (with example) → Confidence level → Tokens used
 
 ## Confidence & token reporting
+
 - Confidence level: report as a percentage (0-100%), derived from retrieval similarity score
   (e.g. cosine similarity normalized to 0-100) combined with generator's self-reported certainty if available.
   Do not fabricate a percentage when no similarity score is available — state "confidence unavailable" instead.
@@ -33,12 +37,15 @@ base behind login/registration, with zero data overlap or overwrite between acco
   - Report format: `Tokens used: 1234 (~$0.0056 USD / ~140,000 VNĐ)`
 
 ## Documentation
+
 - Each project folder includes a docs/ directory in Markdown: one file per module covering purpose,
   inputs/outputs, and dependencies
 - Update docs/ in the same PR as code changes — stale docs are treated as a bug
 
 ## Code comments (Python & C++)
+
 Required on every public function/method:
+
 - @brief
 - @param
 - @objective
@@ -46,6 +53,7 @@ Required on every public function/method:
 - @commented by
 
 ## Things to avoid
+
 - Don't go out of scope — no speculative suggestions without evidence in the retrieved context
 - Don't invent citations or attribute an answer to a document that wasn't retrieved
 - Don't let one user's query touch another user's data/collection, even for debugging or testing
