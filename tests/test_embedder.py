@@ -1,9 +1,8 @@
-import os
 from types import SimpleNamespace
 
 import numpy as np
-import pytest
-from src.embeddings import SentenceTransformerEmbedder, OpenAIEmbedder
+
+from src.embeddings import OpenAIEmbedder, SentenceTransformerEmbedder
 from src.embeddings.embedder import DeepSeeekEmbedder
 
 

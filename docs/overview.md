@@ -1,11 +1,15 @@
 # R.A.G (Retrieval-Augmented Generation)
-> Vietnamese version: Tạo sinh tăng cường truy xuất  
+
+> Vietnamese version: Tạo sinh tăng cường truy xuất
+
 ## 1. What is R.A.G ?
+
 Instead of asking an `LLM` from memory, you first fetch `relevant chunks` from your own documents, then pass those chunks as context to the `LLM` so it answers based on your data
 
 > Short: tạo ngữ cảnh - sau đó áp đặt câu trả lời theo hoàn cảnh trên -> các câu hỏi tiếp theo sẽ tuân theo hoàn cảnh.
 
 ## 2. Build Order:
+
 - `config.yaml`: define your settings first
 - `ingesion/loader.py`: get raw text in [loader.md](loader).
 - `chunking/chunker.py`: split it [chunker.md](chunker)

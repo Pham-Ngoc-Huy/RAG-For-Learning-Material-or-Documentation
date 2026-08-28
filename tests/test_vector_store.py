@@ -1,9 +1,6 @@
-import os
 from types import SimpleNamespace
 
-import pytest
-
-from src.vectordb.vector_store import QdrantVectorStore, Distance
+from src.vectordb.vector_store import Distance, QdrantVectorStore
 
 
 class DummyQdrantClient:
@@ -69,8 +66,16 @@ def test_upsert_stores_points_with_payload_and_user_id(monkeypatch):
     store.create_collection(user_id="alice", vector_size=3)
 
     chunks = [
-        {"text": "hello world", "metadata": {"source": "doc.txt"}, "vector": [0.1, 0.2, 0.3]},
-        {"text": "second chunk", "metadata": {"source": "doc.txt"}, "vector": [0.2, 0.4, 0.6]},
+        {
+            "text": "hello world",
+            "metadata": {"source": "doc.txt"},
+            "vector": [0.1, 0.2, 0.3],
+        },
+        {
+            "text": "second chunk",
+            "metadata": {"source": "doc.txt"},
+            "vector": [0.2, 0.4, 0.6],
+        },
     ]
 
     ids = store.upsert(user_id="alice", chunks=chunks)

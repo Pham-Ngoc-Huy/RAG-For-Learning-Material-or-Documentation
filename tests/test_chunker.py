@@ -1,5 +1,4 @@
-import pytest
-from src.chunking import FixedSizeChunker, RecursiveChunker, MarkDownChunker
+from src.chunking import FixedSizeChunker, MarkDownChunker, RecursiveChunker
 
 
 def test_fixed_size_chunker_splits_with_overlap():

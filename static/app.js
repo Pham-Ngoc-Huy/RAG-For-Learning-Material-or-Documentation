@@ -1,6 +1,7 @@
 const I18N = {
   en: {
-    tagline: "#Hello-This is your supportive-partner: I'm just a child - so teach me :3 ",
+    tagline:
+      "#Hello-This is your supportive-partner: I'm just a child - so teach me :3 ",
     navChat: "Chat",
     navKb: "Knowledge Base",
     chatTitle: "Chat",
@@ -8,11 +9,13 @@ const I18N = {
     kbTitle: "Knowledge Base",
     kbSub: "Upload and manage your learning materials",
     chatEmptyTitle: "Hi! Ask me anything about your uploaded documents.",
-    chatEmptySub: "No documents yet? Head to the Knowledge Base tab to upload one first.",
+    chatEmptySub:
+      "No documents yet? Head to the Knowledge Base tab to upload one first.",
     send: "Send",
     kbUploadTitle: "Drag & drop a file here, or ",
     kbUploadLink: "browse",
-    kbUploadSub: "Supports: PDF, DOCX, PPTX, XLSX, HTML, TXT, MD, images (JPG/PNG)",
+    kbUploadSub:
+      "Supports: PDF, DOCX, PPTX, XLSX, HTML, TXT, MD, images (JPG/PNG)",
     kbListHead: "Ingested documents",
     kbEmptyTitle: "No documents yet",
     themeLabel: "Theme",
@@ -22,7 +25,8 @@ const I18N = {
     error: "Something went wrong, try again.",
     connError: "Couldn't reach the server. Check the backend.",
     uploading: (name) => `Processing "${name}"…`,
-    uploaded: (source, n) => `Ingested "${source}" (${n} chunk${n === 1 ? "" : "s"}).`,
+    uploaded: (source, n) =>
+      `Ingested "${source}" (${n} chunk${n === 1 ? "" : "s"}).`,
     uploadFailed: "Upload failed.",
     uploadConnError: "Couldn't reach the server.",
     loadDocsError: "Couldn't load the document list.",
@@ -33,15 +37,18 @@ const I18N = {
     errorEyebrow: "Error",
   },
   vi: {
-    tagline: "#Hello-This is your supportive-partner: I'm just a child - so teach me :3 ",
+    tagline:
+      "#Hello-This is your supportive-partner: I'm just a child - so teach me :3 ",
     navChat: "Trò chuyện",
     navKb: "Kho tài liệu",
     chatTitle: "Trò chuyện",
     chatSub: "Hỏi bất cứ điều gì về tài liệu đã upload",
     kbTitle: "Kho tài liệu",
     kbSub: "Upload và quản lý tài liệu học tập",
-    chatEmptyTitle: "Chào bạn! Hỏi mình bất cứ điều gì về tài liệu đã upload nhé.",
-    chatEmptySub: "Nếu chưa có tài liệu nào, qua tab \"Kho tài liệu\" để upload trước đã nha.",
+    chatEmptyTitle:
+      "Chào bạn! Hỏi mình bất cứ điều gì về tài liệu đã upload nhé.",
+    chatEmptySub:
+      'Nếu chưa có tài liệu nào, qua tab "Kho tài liệu" để upload trước đã nha.',
     send: "Gửi",
     kbUploadTitle: "Kéo thả file vào đây, hoặc ",
     kbUploadLink: "chọn file",
@@ -75,7 +82,11 @@ const VIEW_HEADERS = {
 const state = {
   history: [], // [{role, content}]
   lang: localStorage.getItem("lang") || "en",
-  theme: localStorage.getItem("theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"),
+  theme:
+    localStorage.getItem("theme") ||
+    (window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light"),
   activeTab: "chat",
 };
 
@@ -88,9 +99,10 @@ function applyLanguage() {
   document.querySelectorAll("[data-i18n]").forEach((el) => {
     el.textContent = t(el.dataset.i18n);
   });
-  document.getElementById("composerInput").placeholder = state.lang === "en"
-    ? "Ask a question about your documents…"
-    : "Đặt câu hỏi về tài liệu của bạn…";
+  document.getElementById("composerInput").placeholder =
+    state.lang === "en"
+      ? "Ask a question about your documents…"
+      : "Đặt câu hỏi về tài liệu của bạn…";
   updateViewHeader();
 
   document.querySelectorAll(".lang-btn").forEach((btn) => {
@@ -130,8 +142,12 @@ document.querySelectorAll(".swatch").forEach((btn) => {
 // ---------------- Nav ----------------
 document.querySelectorAll(".nav-item").forEach((btn) => {
   btn.addEventListener("click", () => {
-    document.querySelectorAll(".nav-item").forEach((b) => b.classList.remove("active"));
-    document.querySelectorAll(".view").forEach((v) => v.classList.remove("active"));
+    document
+      .querySelectorAll(".nav-item")
+      .forEach((b) => b.classList.remove("active"));
+    document
+      .querySelectorAll(".view")
+      .forEach((v) => v.classList.remove("active"));
     btn.classList.add("active");
     state.activeTab = btn.dataset.tab;
     document.getElementById(`view-${state.activeTab}`).classList.add("active");
@@ -218,7 +234,9 @@ function addQuestion(text) {
 
 function addAnswer(text, citations, model) {
   const node = tplAnswer.content.cloneNode(true);
-  node.querySelector(".a-eyebrow").textContent = model ? `${t("assistant")} · ${model}` : t("assistant");
+  node.querySelector(".a-eyebrow").textContent = model
+    ? `${t("assistant")} · ${model}`
+    : t("assistant");
   node.querySelector(".a-text").textContent = text || t("noAnswer");
 
   const citeRow = node.querySelector(".cite-row");
@@ -227,8 +245,11 @@ function addAnswer(text, citations, model) {
     .forEach((c) => {
       const chip = document.createElement("span");
       chip.className = "cite";
-      const score = typeof c.score === "number" ? ` · ${(c.score * 100).toFixed(0)}%` : "";
-      chip.innerHTML = `<span class="dot"></span>${escapeHtml(c.source)}${score}`;
+      const score =
+        typeof c.score === "number" ? ` · ${(c.score * 100).toFixed(0)}%` : "";
+      chip.innerHTML = `<span class="dot"></span>${escapeHtml(
+        c.source,
+      )}${score}`;
       chip.title = c.snippet || "";
       citeRow.appendChild(chip);
     });
@@ -276,13 +297,13 @@ fileInput.addEventListener("change", () => {
   dropZone.addEventListener(evt, (e) => {
     e.preventDefault();
     dropZone.classList.add("dragover");
-  })
+  }),
 );
 ["dragleave", "drop"].forEach((evt) =>
   dropZone.addEventListener(evt, (e) => {
     e.preventDefault();
     dropZone.classList.remove("dragover");
-  })
+  }),
 );
 dropZone.addEventListener("drop", (e) => {
   const file = e.dataTransfer.files[0];
@@ -297,7 +318,10 @@ async function uploadFile(file) {
   formData.append("file", file);
 
   try {
-    const res = await fetch("/api/documents", { method: "POST", body: formData });
+    const res = await fetch("/api/documents", {
+      method: "POST",
+      body: formData,
+    });
     const data = await res.json();
 
     if (!res.ok) {
@@ -327,9 +351,16 @@ async function loadDocuments() {
     docs.forEach((doc) => {
       const node = tplDocRow.content.cloneNode(true);
       node.querySelector(".doc-name").textContent = doc.source;
-      const meta = [doc.file_type?.toUpperCase(), t("chunkCount")(doc.chunk_count)].filter(Boolean).join(" · ");
+      const meta = [
+        doc.file_type?.toUpperCase(),
+        t("chunkCount")(doc.chunk_count),
+      ]
+        .filter(Boolean)
+        .join(" · ");
       node.querySelector(".doc-meta").textContent = meta;
-      node.querySelector(".doc-delete").addEventListener("click", () => deleteDocument(doc.source));
+      node
+        .querySelector(".doc-delete")
+        .addEventListener("click", () => deleteDocument(doc.source));
       kbList.appendChild(node);
     });
   } catch (err) {
@@ -341,7 +372,9 @@ async function loadDocuments() {
 async function deleteDocument(source) {
   if (!confirm(t("deleteConfirm")(source))) return;
   try {
-    await fetch(`/api/documents/${encodeURIComponent(source)}`, { method: "DELETE" });
+    await fetch(`/api/documents/${encodeURIComponent(source)}`, {
+      method: "DELETE",
+    });
     loadDocuments();
   } catch (err) {
     kbStatus.textContent = t("deleteFailed");
@@ -354,5 +387,8 @@ applyLanguage();
 loadDocuments();
 fetch("/api/health")
   .then((r) => r.json())
-  .then((d) => (document.getElementById("footerModel").textContent = d.llm_model || "—"))
+  .then(
+    (d) =>
+      (document.getElementById("footerModel").textContent = d.llm_model || "—"),
+  )
   .catch(() => {});
