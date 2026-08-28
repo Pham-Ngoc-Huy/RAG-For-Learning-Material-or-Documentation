@@ -1,6 +1,4 @@
-from types import SimpleNamespace
-
-from qdrant_client.models import Filter, FieldCondition, MatchValue
+from qdrant_client.models import FieldCondition, Filter, MatchValue
 
 from src.retrieval import QdrantRetriever
 

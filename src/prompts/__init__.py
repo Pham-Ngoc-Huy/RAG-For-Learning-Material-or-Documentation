@@ -1,9 +1,3 @@
-from .prompt_templates import (
-    PromptTemplate, 
-    PromptAssistance
-)
+from .prompt_templates import PromptAssistance, PromptTemplate
 
-__all__ = [
-    "PromptTemplate",
-    "PromptAssistance"
-]
+__all__ = ["PromptTemplate", "PromptAssistance"]

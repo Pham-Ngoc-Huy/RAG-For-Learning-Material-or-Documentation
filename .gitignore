@@ -1,5 +1,6 @@
 .env
 .vscode/
+qdrant_data/
 
 # Python cache and virtual environments
 __pycache__/

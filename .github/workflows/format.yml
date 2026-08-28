@@ -1,0 +1,22 @@
+name: Check format codebase
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prek:
+    name: prek run --all-files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run prek
+        uses: j178/prek-action@v2

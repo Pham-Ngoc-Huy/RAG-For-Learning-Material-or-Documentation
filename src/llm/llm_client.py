@@ -1,14 +1,17 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Optional
+
 from openai import OpenAI
+
 
 @dataclass
 class LLMResponse:
-    text:str
-    provider:str
-    model:str
-    response:str
+    text: str
+    provider: str
+    model: str
+    response: str
+
 
 class BaseLLMClient(ABC):
     """
@@ -39,48 +42,38 @@ class BaseLLMClient(ABC):
         """
         pass
 
+
 class ThinkingFromKnowledgeBase(BaseLLMClient):
     def __init__(
         self,
-        api_key: Optional[str]=None,
-        base_url: Optional[str]=None,
-        model:str=None,
-        provider:str=None
+        api_key: Optional[str] = None,
+        base_url: Optional[str] = None,
+        model: str = None,
+        provider: str = None,
     ):
-        self.model=model
-        self.provider=provider
+        self.model = model
+        self.provider = provider
         if not api_key:
             raise ValueError("There is no API Key exists")
-        self.api_key=api_key
+        self.api_key = api_key
 
-        self.client=OpenAI(
-            api_key=self.api_key, 
-            base_url=base_url
-        )
+        self.client = OpenAI(api_key=self.api_key, base_url=base_url)
 
     def generate(
-        self, 
-        prompt:Optional[str]=None, 
-        messages:Optional[list[dict]]=None, 
-        max_tokens:int=500, 
-        temperature:float=0.7
+        self,
+        prompt: Optional[str] = None,
+        messages: Optional[list[dict]] = None,
+        temperature: float = 0.7,
     ) -> LLMResponse:
-        
         # if not prompt or not messages:
         #     raise ValueError("Must provide either `prompt` or `messages`")
 
-        payload_messages = messages or  [
-            {
-                "role":"user",
-                "content":prompt
-            }
-        ]
+        payload_messages = messages or [{"role": "user", "content": prompt}]
         try:
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=payload_messages,
-                max_tokens=max_tokens,
-                temperature=temperature
+                temperature=temperature,
             )
 
             answer_text = response.choices[0].message.content
@@ -89,7 +82,7 @@ class ThinkingFromKnowledgeBase(BaseLLMClient):
                 text=answer_text,
                 provider=self.provider,
                 model=self.model,
-                response=response.model_dump()
+                response=response.model_dump(),
             )
 
         except Exception as e:
@@ -98,5 +91,5 @@ class ThinkingFromKnowledgeBase(BaseLLMClient):
                 text=f"Error: {str(e)}",
                 provider=self.provider,
                 model=self.model,
-                response={}
+                response={},
             )

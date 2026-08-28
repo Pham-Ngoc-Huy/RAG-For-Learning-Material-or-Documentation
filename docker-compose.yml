@@ -1,14 +1,27 @@
-version: "3.12"
-
 services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    env_file:
-      - .env
+  qdrant:
+    image: qdrant/qdrant:latest
+    restart: always
+    container_name: qdrant
     ports:
-      - "8000:8000"
+      - 6333:6333
+      - 6334:6334
+    expose:
+      - 6333
+      - 6334
+      - 6335
+    configs:
+      - source: qdrant_config
+        target: /qdrant/config/production.yaml
     volumes:
-      - .:/app
-    command: uv run main.py
+      - qdrant_data:/qdrant/storage
+    environment:
+      QDRANT__SERVICE__API_KEY: "admin123"
+
+configs:
+  qdrant_config:
+    content: |
+      log_level: INFO
+
+volumes:
+  qdrant_data:
