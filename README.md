@@ -1,4 +1,5 @@
 # RAG-For-Learning-Material-or-Documentation
+
 This is supporting for students who study in VGU for documentation and ask/answer chatbot
 
 ## 1. Docker Setup
@@ -18,6 +19,7 @@ Or use Docker Compose:
 Customize the exposed port or command as needed if your app entrypoint changes.
 
 ## 2. Knowledgable:
+
 > _**Note**_: This must be understood when we want to build once for yourselve
 
 ```mermaid
@@ -45,26 +47,30 @@ flowchart TD
         L --> A[Final Answer]
     end
 ```
+
 ### 2.1. Ingestion (Loader)
-**Description:** 
-> This function is for turning the all the documents (that update to system then load to the vector database) into markdown files: 
+
+**Description:**
+
+> This function is for turning the all the documents (that update to system then load to the vector database) into markdown files:
 
 **New-Insight: We can use model from Gemini for better OCR -> from jpg or png to text** (Havent in production yet)
 
-> [!NOTE]
-> **Loader**
+> [!NOTE] > **Loader**
 >
 > **File destination:** `/ingestion/loader.py`
 >
 > **Input:** `file_path` or `user-input-file`
 >
 > **Process:**
+>
 > 1. Recieve Input of Users (File-Path, File-Name, URL)
 > 2. Recognize the suffix-extension of the file-type (`.pdf`, `.txt`, `.csv`, `.png`, ...)
 > 3. Using the libraries to convert all-types into `.md` file (MarkItDown, pdf-inspector, ocr-libs [future consideration])
 > 4. Save the text into `output-scheme` and **output-file into output-directory**
 >
 > **Output:**
+>
 > - **Datatype:** `Struct`
 > - **Output Scheme:**
 >
@@ -83,17 +89,21 @@ flowchart TD
 **Example**
 
 ```python
-# create main.py 
+# create main.py
 from ingestion import FileLoader
 file_path='file_path' # put path to file here
 
 output=FileLoader(file_path=file_path).load()
 ```
+
 ### 2.2. Chunking
+
 **Desription**
+
 > The **Chunking** stage splits the loaded document into smaller pieces called **chunks**. These chunks are used as context windows for retrieval from the vector database
 
 It will have 2 variable fixed `DEFAULT CHUNK SIZE` and `DEFAULT CHUNK OVERLAP`
+
 - `DEFAULT CHUNK SIZE`: define the maximum number of characters contained in a single chunk
 - `DEFAULT CHUNK OVERLAP`: define the number of characters shared between two consecutive chunks
 
@@ -112,21 +122,21 @@ Chunk 2:                [--------------------------------
                         1000 characters
                         <------ 200 - character overlap ------->
 
-Chunk 3: 
+Chunk 3:
                                         [---------------------
                                         1000 characters
 ```
 
 **Note**: The overlap helps preserve contextual information between adjacent chunks and reduces the risk of losing important information at chunk boundaries
 
-> [!NOTE]
-> **Loader**
+> [!NOTE] > **Loader**
 >
 > **File destination:** `/chunking/chunker.py`
 >
 > **Input:** `doc` with `dictionary` datatype
 >
 > **Process:**
+>
 > 1. Receive the `text` and `metadata` from the Loader output.
 > 2. Select a chunking strategy based on the document structure:
 >    - **Fixed-Size Chunking:** Split text based on a fixed character/token limit.
@@ -137,6 +147,7 @@ Chunk 3:
 > 5. Return a list of chunk objects containing the chunked `text` and its corresponding `metadata`.
 >
 > **Output:**
+>
 > - **Datatype:** `Struct`
 > - **Output Scheme:**
 >
@@ -164,24 +175,27 @@ Chunk 3:
 >
 > The Vector Store also supports **tenant isolation**, where each `user_id` receives an isolated collection and all search/delete operations are scoped to that user.
 
-> [!NOTE]
-> **Vector Store**
+> [!NOTE] > **Vector Store**
 >
 > **File destination:**
+>
 > - `/vectordb/vector_store.py`
 >
 > **Input:**
+>
 > - `chunks`: list of chunk objects produced by the Chunking stage
 > - `user_id`: identifier used for tenant isolation
 > - `query_vector`: embedding vector generated from the user's query (_this is for searching function_)
 >
 > **Configuration / Environment:**
+>
 > - `QDRANT_URL`: URL of the Qdrant instance
 > - `QDRANT_API_KEY`: API key for hosted Qdrant (optional)
 > - `VECTOR_DIM`: dimension of the embedding vector
 > - `DISTANCE`: similarity metric used by Qdrant, e.g. `Cosine`, `Dot`, or `Euclid` (in this project we use COSINE DISTANCE)
 >
 > **Process:**
+>
 > 1. Receive chunk objects from the Chunking stage.
 > 2. Create or retrieve a Qdrant collection for the corresponding `user_id`.
 > 3. Validate that each chunk contains an embedding vector.
@@ -192,6 +206,7 @@ Chunk 3:
 >    entire collection.
 >
 > **Output:**
+>
 > - **Datatype:** `List[Dict]`
 > - **Output Scheme:**
 >
@@ -231,30 +246,42 @@ flowchart LR
 ```
 
 ### 2.4. Embedded
+
 # References
 
 ## [1] MarkItDown — Repo
+
 > Turn file formats into `.md` files.
 >
 > **URL:** https://github.com/microsoft/markitdown
 
 ## [2] Qdrant — Vector Database
+
 > Store and embed vector data.
 >
-> **Repository:** https://github.com/qdrant/qdrant  
-> **Python Client Documentation:** https://qdrant.tech/documentation/clients/python/
+> **Repository:** https://github.com/qdrant/qdrant > **Python Client Documentation:** https://qdrant.tech/documentation/clients/python/
 
 ## [3] pdf_inspector — Repo
+
 > 99% valid-rate for converting `.pdf` files to Markdown.
 >
 > **URL:** https://github.com/firecrawl/pdf-inspector
 
 ## [4] PaddleOCR — OCR Engine
+
 > Near-future add-in for OCR processing of scanned/image-based documents.
 >
 > **URL:** https://github.com/PaddlePaddle/PaddleOCR
+
 ## [5] Unlimited OCR [Near future add-in]
+
 > [!NOTE]
 > OCR support for scanned PDFs and image-based documents.
 > Planned as a fallback when MarkItDown / pdf_inspector cannot
 > extract the document content reliably.
+
+## [6] Conventional Commits
+
+> A specification for adding human and machine-readable meaning to commit messages.
+>
+> **URL:** https://www.conventionalcommits.org/en/v1.0.0/

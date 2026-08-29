@@ -1,13 +1,12 @@
 from abc import ABC, abstractmethod
+
 import openai
 from sentence_transformers import SentenceTransformer
 
+
 class BaseEmbedder(ABC):
     @abstractmethod
-    def embed_one(
-        self, 
-        text: str
-    ) -> list[float]:
+    def embed_one(self, text: str) -> list[float]:
         """Embed a single string -> vector"""
         pass
 
@@ -16,19 +15,13 @@ class BaseEmbedder(ABC):
     def get_vectorspace_dimensions(self) -> int:
         pass
 
-    def _batch_embed(
-        self,
-        texts: list[str]
-    ) -> list[list[float]]:
+    def _batch_embed(self, texts: list[str]) -> list[list[float]]:
         """
         Default: embed one by one. Subclasses can override for true batching.
         """
         return [self.embed_one(t) for t in texts]
-    
-    def embed_many(
-        self,
-        chunks: list[dict]
-    ) -> list[dict]:
+
+    def embed_many(self, chunks: list[dict]) -> list[dict]:
         """
         Embed a user query string
         Seperate method - some models use different
@@ -42,10 +35,7 @@ class BaseEmbedder(ABC):
 
         return chunks
 
-    def embed_query(
-        self,
-        query:str
-    ) -> list[float]:
+    def embed_query(self, query: str) -> list[float]:
         """
         Embed a user query string.
         Separate method - some models use different
@@ -53,13 +43,9 @@ class BaseEmbedder(ABC):
         """
         return self.embed_one(query)
 
+
 class ModelEmbedder(BaseEmbedder):
-    def __init__(
-        self,
-        model:str=None,
-        base_url:str=None,
-        api_key:str=None
-    ):
+    def __init__(self, model: str = None, base_url: str = None, api_key: str = None):
         self.model = model
         self.base_url = base_url
         self.api_key = api_key
@@ -74,10 +60,7 @@ class ModelEmbedder(BaseEmbedder):
             if self.api_key is None:
                 print("Warning: API Key is missing. Using dummy key 'not-needed' for OpenAI SDK compatibility.")
                 actual_api_key = "not-needed"
-            self.client = openai.OpenAI(
-                base_url=self.base_url, 
-                api_key=actual_api_key
-            )
+            self.client = openai.OpenAI(base_url=self.base_url, api_key=actual_api_key)
             self.is_local = False
 
     @property
@@ -90,8 +73,8 @@ class ModelEmbedder(BaseEmbedder):
                 response = self.client.embeddings.create(input="Hi", model=self.model)
                 self._dimensions = len(response.data[0].embedding)
         return self._dimensions
-    
-    def embed_one(self, text:str):
+
+    def embed_one(self, text: str):
         if self.is_local:
             return self.client.encode(text).tolist()
         else:
@@ -106,3 +89,33 @@ class ModelEmbedder(BaseEmbedder):
             response = self.client.embeddings.create(input=texts, model=self.model)
             vectors = [item.embedding for item in response.data]
             return vectors
+
+
+class FastEmbedder(BaseEmbedder):
+    """
+    Local, API-key-free embedder backed by `fastembed`.
+    Used as a fallback when no API key is configured for the
+    remote embedding provider.
+    """
+
+    def __init__(self, model: str = "BAAI/bge-small-en-v1.5"):
+        from fastembed import TextEmbedding
+
+        self.model = model
+        self._dimensions = None
+        self.client = TextEmbedding(model_name=self.model)
+
+    @property
+    def get_vectorspace_dimensions(self):
+        if self._dimensions is None:
+            embedding = next(self.client.embed(["Hi"]))
+            self._dimensions = len(embedding)
+        return self._dimensions
+
+    def embed_one(self, text: str) -> list[float]:
+        embedding = next(self.client.embed([text]))
+        return embedding.tolist()
+
+    def _batch_embed(self, texts: list[str]) -> list[list[float]]:
+        embeddings = self.client.embed(texts)
+        return [embedding.tolist() for embedding in embeddings]

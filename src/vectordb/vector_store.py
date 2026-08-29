@@ -1,4 +1,3 @@
-import os
 import uuid
 from abc import ABC, abstractmethod
 from typing import Optional
@@ -6,12 +5,13 @@ from typing import Optional
 from qdrant_client import QdrantClient
 from qdrant_client.models import (
     Distance,
-    VectorParams,
-    PointStruct,
-    Filter,
     FieldCondition,
+    Filter,
     MatchValue,
+    PointStruct,
+    VectorParams,
 )
+
 
 class BaseVectorStore(ABC):
     @abstractmethod
@@ -125,19 +125,11 @@ class QdrantVectorStore(BaseVectorStore):
         @update date 2026-08-05
         @commented by Huy Pham
         """
-        self.endpoint=endpoint
-        self.api_key=api_key
-        self.client = QdrantClient(
-            url=self.endpoint, 
-            api_key=self.api_key, 
-            prefer_grpc=prefer_grpc
-        )
+        self.endpoint = endpoint
+        self.api_key = api_key
+        self.client = QdrantClient(url=self.endpoint, api_key=self.api_key, prefer_grpc=prefer_grpc)
 
-    def _collection_name(
-        self, 
-        user_id: str, 
-        collection_name: Optional[str] = None
-    ) -> str:
+    def _collection_name(self, user_id: str, collection_name: Optional[str] = None) -> str:
         """
         @brief Compute a tenant-isolated collection name.
         @param user_id: tenant identifier
@@ -234,7 +226,11 @@ class QdrantVectorStore(BaseVectorStore):
         try:
             self.client.get_collection(collection_name=collection)
         except Exception:
-            self.create_collection(user_id=user_id, vector_size=len(chunks[0]["vector"]), collection_name=collection_name)
+            self.create_collection(
+                user_id=user_id,
+                vector_size=len(chunks[0]["vector"]),
+                collection_name=collection_name,
+            )
 
         points = []
         for chunk in chunks:
@@ -300,5 +296,9 @@ class QdrantVectorStore(BaseVectorStore):
         collection_name: Optional[str] = None,
     ) -> None:
         collection = self._collection_name(user_id, collection_name)
+        try:
+            self.client.get_collection(collection_name=collection)
+        except Exception:
+            # Collection doesn't exist yet, nothing to delete.
+            return
         self.client.delete_collection(collection_name=collection)
-    

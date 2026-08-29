@@ -1,13 +1,16 @@
 # Vector Store (vectordb)
 
 ## Description
+
 Vector store (VectorDB) stores embeddings (fixed-dimension vectors) and associated metadata for fast semantic retrieval. In this project Qdrant is the recommended store; other providers (Pinecone, Milvus, etc.) can be used with an adapter.
 
 ## File destination
-- /vectordb/manager.py  (wrapper around provider client)
+
+- /vectordb/manager.py (wrapper around provider client)
 - /ingestion/ -> produces chunk objects to be inserted
 
 ## Config / Environment
+
 - QDRANT_URL: URL to the Qdrant instance (e.g. http://localhost:6333)
 - QDRANT_API_KEY: API key if hosted (optional)
 - VECTORDB_COLLECTION: default collection name, e.g. "rag_docs"
@@ -15,7 +18,9 @@ Vector store (VectorDB) stores embeddings (fixed-dimension vectors) and associat
 - DISTANCE: similarity metric, e.g. "Cosine" or "Dot" or "Euclid"
 
 ## Schema / Metadata
+
 Each vector entry should include:
+
 - id: stable id for the chunk (string)
 - vector: embedding (list[float])
 - payload / metadata: dictionary containing
@@ -27,12 +32,14 @@ Each vector entry should include:
   - any custom tags (e.g., topic, language)
 
 ## Process
+
 1. Receive chunk objects from ingestion: {text, metadata}
 2. Compute embedding using chosen model (ensure VECTOR_DIM)
 3. Upsert vectors and metadata into collection
 4. Provide a Retriever API that accepts query embeddings and returns top-k chunks
 
 ## Example (Python + qdrant-client)
+
 ```python
 from qdrant_client import QdrantClient
 from qdrant_client.http import models
@@ -67,20 +74,25 @@ for res in results:
 ```
 
 ## Retriever contract
+
 Expose a simple Retriever interface:
+
 - build_index(chunks: List[Chunk]) -> None
 - query(query_text: str, top_k: int = 5) -> List[Chunk]
 
 Implementation should handle batching upserts, retries, and backoff for network errors.
 
 ## Notes
+
 - Keep VECTOR_DIM consistent with the embedding model to avoid errors
 - Use chunk ids stable across re-ingestion to avoid duplicates
 - Consider sharding/collections per-tenant for multi-tenancy
 
 ## References
+
 - Qdrant: https://github.com/qdrant/qdrant
 - qdrant-client docs: https://qdrant.tech/documentation/clients/python/
 
 ---
+
 Generated following style in README.md (sections: Description, File destination, Config, Process, Example, References).

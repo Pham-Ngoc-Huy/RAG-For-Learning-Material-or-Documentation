@@ -1,19 +1,28 @@
-from markitdown import MarkItDown
-from pathlib import Path
-from datetime import datetime
-from typing import Optional
 from abc import ABC, abstractmethod
+from datetime import datetime
+from pathlib import Path
+from typing import Optional
+
 import pdf_inspector
+from markitdown import MarkItDown
 
 SUPPORT_EXTENSIONS = {
-    ".pdf", ".docx", ".pptx", ".xlsx",
-    ".html", ".htm", ".txt", ".md",
-    ".jpg", ".jpeg", ".png"
+    ".pdf",
+    ".docx",
+    ".pptx",
+    ".xlsx",
+    ".html",
+    ".htm",
+    ".txt",
+    ".md",
+    ".jpg",
+    ".jpeg",
+    ".png",
 }
 # objective: init once at module level
-mid = MarkItDown(
-    cu_endpoint="<content_understanding_endpoint"
-)
+mid = MarkItDown(cu_endpoint="<content_understanding_endpoint")
+
+
 class BaseLoader(ABC):
     """
     All loader must implement load()
@@ -23,34 +32,29 @@ class BaseLoader(ABC):
     def load(self) -> Optional[dict]:
         pass
 
-    def _build_metadata(
-        self,
-        source:str,
-        file_type:str,
-        file_path:str
-    ) -> dict:
+    def _build_metadata(self, source: str, file_type: str, file_path: str) -> dict:
         """Shared metadata builder for all subclasses"""
         return {
-            "source":source,
-            "file_path":file_path,
-            "file_type":file_type,
-            "loaded_at":datetime.today().isoformat()
+            "source": source,
+            "file_path": file_path,
+            "file_type": file_type,
+            "loaded_at": datetime.today().isoformat(),
         }
+
 
 class FileLoader(BaseLoader):
     """
     Drop and Drag files directly to platform
     """
-    def __init__(
-        self,
-        file_path:str
-    ):
+
+    def __init__(self, file_path: str):
         self.file_path = Path(file_path)
+
     def load(self) -> Optional[dict]:
         if not self.file_path.exists():
             raise FileNotFoundError(f"File not found: {self.file_path}")
         if self.file_path.suffix.lower() not in SUPPORT_EXTENSIONS:
-            raise ValueError(f"Unsupported type: {self.file_path.suffix.lower()}") 
+            raise ValueError(f"Unsupported type: {self.file_path.suffix.lower()}")
 
         try:
             if self.file_path.suffix.lower() == ".pdf":
@@ -61,33 +65,32 @@ class FileLoader(BaseLoader):
                 text = result.text_content.strip()
 
             if not text:
-                return None 
+                return None
 
             with open(f"md_store/{self.file_path.stem}.md", "w", encoding="utf-8") as f:
                 print(f"Writing: {self.file_path.stem} as markdown format")
                 f.write(result.markdown)
 
             return {
-                "text":text,
+                "text": text,
                 "metadata": self._build_metadata(
                     source=self.file_path.name,
                     file_type=self.file_path.suffix.lower().lstrip("."),
-                    file_path=str(self.file_path.resolve())
-                )
+                    file_path=str(self.file_path.resolve()),
+                ),
             }
 
         except Exception as e:
             print(f"[FileLoader] Failed: {e}")
             return None
 
+
 class DirectoryLoader(BaseLoader):
     """
     Drop and drag a directory_path input
     """
-    def __init__(
-        self, 
-        dir_path:str
-    ):
+
+    def __init__(self, dir_path: str):
         self.dir_path = Path(dir_path)
 
     def load(self) -> list[dict]:
@@ -104,12 +107,11 @@ class DirectoryLoader(BaseLoader):
         print(f"[DirectoryLoader] Loaded {len(docs)} docs from {self.dir_path}")
         return docs
 
+
 class URLLoader(BaseLoader):
-    def __init__(
-        self,
-        url:str
-    ):
+    def __init__(self, url: str):
         self.url = url
+
     def load(self) -> Optional[dict]:
         try:
             result = mid.convert(self.url)
@@ -119,12 +121,8 @@ class URLLoader(BaseLoader):
                 return None
 
             return {
-                "text":text,
-                "metadata": self._build_metadata(
-                    source=self.url,
-                    file_type="url",
-                    file_path=self.url
-                )
+                "text": text,
+                "metadata": self._build_metadata(source=self.url, file_type="url", file_path=self.url),
             }
         except Exception as e:
             print(f"[URLLoader] Failed: {e}")

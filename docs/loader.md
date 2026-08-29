@@ -1,8 +1,11 @@
 # Loader:
+
 Load input `file/directory/url` and transform into `.md` file
 
 ## 1. File Extension Supporting:
+
 File can read in this `loader.py` must have this suffix extension:
+
 - pdf
 - docx
 - pptx
@@ -16,6 +19,7 @@ File can read in this `loader.py` must have this suffix extension:
 - png
 
 ## 2. Loader
+
 > **Result return:** The result of the `loader.py` will be a shared metadata builder which will has format:
 
 ```json
@@ -24,33 +28,45 @@ File can read in this `loader.py` must have this suffix extension:
 "file_type":file_type,
 "loaded_at":datetime.today().isoformat()
 ```
+
 ### 2.1. File Loader (Subclass)
+
 ---
+
 This function will handle input as `file` and return it as output format as `.md` file
 
 **Usage:**
+
 ```python
 from src.ingestion import FileLoader
 
 doc = FileLoader(`file_path`).load()
 # where file_path will be the `path` to file has suffix as the list `file extension supporting` above
 ```
+
 ### 2.2. Directory Loader (Subclass)
+
 ---
+
 This function will handle input as `directory` which is it will turn all files in the `destination_path` into `.md` if it match the `file-extension-supporting`
 
 **Usage**
+
 ```python
 from src.ingestion import DirectoryLoader
 
 docs = DirectoryLoader(`directory_path`).load()
 # where file_path will be the `path` to directory where files has suffix as the list `file extension supporting` above
 ```
+
 ### 2.3. URL Loader (Subclass)
+
 ---
-This function will handle input as `URL` and the action will crawl the `HTML` into `.md` 
+
+This function will handle input as `URL` and the action will crawl the `HTML` into `.md`
 
 **Usage**
+
 ```python
 from src.ingestion import URLLoader
 

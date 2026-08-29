@@ -1,9 +1,8 @@
-import os
-from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
-from src.ingestion import FileLoader, DirectoryLoader, URLLoader
+
+from src.ingestion import DirectoryLoader, FileLoader, URLLoader
 
 
 def test_file_loader_writes_markdown(tmp_path, monkeypatch):
