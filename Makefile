@@ -7,7 +7,7 @@ find-clean:
 	@for root in . src tests api docs config temp; do \
 		if [ -d "$$root" ]; then \
 			echo "Checking $$root/:"; \
-			found=$$(find $$root -type d \( -name "__pycache__" -o -name ".ipycheckpoints" -o -name ".ipynb_checkpoints" \) 2>/dev/null); \
+			found=$$(find $$root -type d \( -name "__pycache__" -o -name "Icon" -o -name ".ipycheckpoints" -o -name ".ipynb_checkpoints" \) 2>/dev/null); \
 			if [ -n "$$found" ]; then \
 				echo "$$found" | sed 's/^/  /'; \
 			else \
@@ -24,7 +24,7 @@ clean-root:
 	@for root in . src tests api docs config temp; do \
 		if [ -d "$$root" ]; then \
 			echo "Cleaning $$root/:"; \
-			find $$root -type d \( -name "__pycache__" -o -name ".ipycheckpoints" -o -name ".ipynb_checkpoints" \) -prune -exec rm -rf {} + 2>/dev/null; \
+			find $$root -type d \( -name "__pycache__" -o -name "Icon" -o -name ".ipycheckpoints" -o -name ".ipynb_checkpoints" \) -prune -exec rm -rf {} + 2>/dev/null; \
 			echo "  ✓ Done"; \
 			echo ""; \
 		fi; \
@@ -33,5 +33,5 @@ clean-root:
 # clean: remove __pycache__ and Jupyter checkpoint directories (recursive)
 clean:
 	@echo "Removing __pycache__ and checkpoint directories recursively..."
-	@find . -type d \( -name "__pycache__" -o -name ".ipycheckpoints" -o -name ".ipynb_checkpoints" \) -prune -exec rm -rf {} + 2>/dev/null
+	@find . -type d \( -name "__pycache__" -o -name "Icon" -o -name ".ipycheckpoints" -o -name ".ipynb_checkpoints" \) -prune -exec rm -rf {} + 2>/dev/null
 	@echo "✓ Cleanup complete"

@@ -1,6 +1,8 @@
 from fastapi import APIRouter, HTTPException
-from src.api.schemas.auth import LoginRequest, LoginResponse
+
+from src.api.schemas.auth import LoginRequest
 from src.api.services.auth import authenticate_user
+
 router = APIRouter(
     prefix="/auth",
     tags=["Authentication"],
@@ -21,9 +23,7 @@ def login(requests: LoginRequest):
 
     return user
 
+
 @router.post("/logout")
-def logout(username:str, logout: bool):
-    return {
-        "username": username,
-        "message": "logout successful"
-    }
+def logout(username: str, logout: bool):
+    return {"username": username, "message": "logout successful"}
