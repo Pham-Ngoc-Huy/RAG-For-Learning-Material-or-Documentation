@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+
 from src.api.schemas.auth import LoginRequest, SignUpRequest
 from src.api.services.auth import AuthService
 
