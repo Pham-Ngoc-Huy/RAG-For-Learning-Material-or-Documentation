@@ -1,29 +1,33 @@
 from fastapi import APIRouter, HTTPException
-
-from src.api.schemas.auth import LoginRequest
-from src.api.services.auth import authenticate_user
+from src.api.schemas.auth import LoginRequest, SignUpRequest
+from src.api.services.auth import AuthService
 
 router = APIRouter(
     prefix="/auth",
     tags=["Authentication"],
 )
 
+auth = AuthService()
 
-@router.post("/login")
-def login(requests: LoginRequest):
-    user = authenticate_user(
-        username=requests.username,
-        password=requests.password,
-    )
-    if user is None:
+
+@router.post("/signup")
+async def signup(requests: SignUpRequest):
+    try:
+        await auth.signup(requests)
+        return {"message": "User created successfully"}
+    except ValueError as e:
         raise HTTPException(
-            status_code=401,
-            detail="Invalid username or password",
+            status_code=400,
+            detail=str(e),
         )
 
-    return user
 
-
-@router.post("/logout")
-def logout(username: str, logout: bool):
-    return {"username": username, "message": "logout successful"}
+@router.post("/login")
+async def login(requests: LoginRequest):
+    user = await auth.login(requests)
+    if not user:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid username or password",
+        )
+    return {"message": "Login successful"}

@@ -23,6 +23,11 @@ dependencies = [
     "python-dotenv>=1.0.0",
     "fastembed>=0.8.0",
     "pre-commit>=4.6.2",
+    "passlib>=1.7.4",
+    "sqlalchemy>=2.0.52",
+    "databases>=0.9.0",
+    "aiosqlite>=0.22.1",
+    "bcrypt>=5.0.0",
 ]
 
 [tool.vercel]
