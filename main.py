@@ -4,9 +4,7 @@ from abc import ABC, abstractmethod
 from dotenv import load_dotenv
 
 from config.config_loader import OmegaConfigLoader
-from src.chunking import MarkDownChunker
 from src.embeddings import FastEmbedder, ModelEmbedder
-from src.ingestion import FileLoader
 from src.llm import ThinkingFromKnowledgeBase
 from src.prompts import PromptAssistance
 from src.retrieval import QdrantRetriever
@@ -109,7 +107,6 @@ class QdrantCollection(ConstructorLoops):
         return self.vector_store.upsert(user_id=self.user_id, collection_name=collection_name, chunks=chunks)
 
 
-# class
 class Embedded(ConstructorLoops):
     def query(self, text: str, collection_name: str) -> None:
         pass
@@ -122,7 +119,7 @@ class Embedded(ConstructorLoops):
 
 
 def main():
-    load_dotenv()
+    load_dotenv(dotenv_path=".env.example")
     model_chosen = os.getenv("MODEL_CHOSEN", "openrouter")
 
     # load config
@@ -151,29 +148,29 @@ def main():
     user_id = "huypham"
     collection_name = "AI"
     user_name = "user_default_user_documents"
-    question = "what is disturbance?"
+    question = "what is disturbance observer ?"
 
-    file_path = "temp/Tutorial_NDO.pdf"
+    # file_path = "temp/Tutorial_NDO.md"
 
-    # Create Collection
-    qdrant_collection = QdrantCollection(config=config, user_id=user_id, user_name=user_name, model=model_chosen)
+    # # # Create Collection
+    # qdrant_collection = QdrantCollection(config=config, user_id=user_id, user_name=user_name, model=model_chosen)
 
-    qdrant_collection.delete(collection_name=collection_name)
-    qdrant_collection.create(collection_name=collection_name)
+    # qdrant_collection.delete(collection_name=collection_name)
+    # qdrant_collection.create(collection_name=collection_name)
 
-    # Chunks
-    doc_result = FileLoader(file_path=file_path).load()
-    chunks = MarkDownChunker().chunk(doc=doc_result)
+    # # Chunks
+    # doc_result = FileLoader(file_path=file_path).load()
+    # chunks = MarkDownChunker().chunk(doc=doc_result)
 
-    # Embedded
-    embedder = Embedded(config=config, user_id=user_id, user_name=user_name, model=model_chosen)
-    chunks = embedder.embed_many(chunks=chunks)
-    qdrant_collection.upsert(collection_name=collection_name, chunks=chunks)
+    # # Embedded
+    # embedder = Embedded(config=config, user_id=user_id, user_name=user_name, model=model_chosen)
+    # chunks = embedder.embed_many(chunks=chunks)
+    # qdrant_collection.upsert(collection_name=collection_name, chunks=chunks)
 
     rag_pipeline = AskAndAnswer(config=config, user_id=user_id, user_name=user_name, model=model_chosen)
     response = rag_pipeline.query(text=question, collection_name=collection_name)
 
-    print("Repsonding: \n")
+    print("Response: \n")
     print(response.text)
 
 
