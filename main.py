@@ -148,7 +148,7 @@ def main():
     user_id = "huypham"
     collection_name = "AI"
     user_name = "user_default_user_documents"
-    question = "what is disturbance observer ?"
+    question = "who is Nguyen Huu Tri ?"
 
     # file_path = "temp/Tutorial_NDO.md"
 
