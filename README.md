@@ -247,6 +247,144 @@ flowchart LR
 
 ### 2.4. Embedded
 
+**Notation:**
+
+`Dimension of vector space` : This is the number of neural of last layer of the hidden layer when goes to output layer for final calculation.
+
+**Description:**
+
+> The **Embedding** stage turns the chunked text into high-dimensional **vectors** (embeddings) that capture the semantic meaning of the text. These vectors are then stored in the Vector Store and later used to compute the similarity between a user query and each chunk during retrieval.
+
+_Input:_
+
+- `model`: model that use for embed to vectordb purpose
+- `base_url`: url connect to that model that can be `local` also for developing purpose
+- `api_key`: key access to the model embedded that already authorize
+
+_Processing:_
+
+We have 2 type of processing:
+
+1. Model-Embedder
+
+2. Fast-Embedder (from `fastembed` library [this-new])
+
+> [!NOTE]:
+>
+> It just different in model usage only 
+>
+> - With Fast-Embedder -> we do not need to import model/api_key/url
+>
+> - With Model-Embedder -> we must include all the model/api_key/url -> for authentication
+> 
+> The processing in general is the same
+
+> [!NOTE] > **Embedder**
+>
+> **File destination:**
+>
+> - `/src/embeddings/embedder.py`
+>
+> **Input:**
+>
+> - `chunks`: list of chunk objects produced by the Chunking stage (each chunk contains `text` and `metadata`)
+> - `query`: the user query string (_this is for embedding a query before searching_)
+>
+> **Implementations:**
+>
+> - **`BaseEmbedder`:** abstract interface that defines `embed_one()`, `embed_many()`, `embed_query()` and `get_vectorspace_dimensions`.
+> - **`ModelEmbedder`:** connects to a remote OpenAI-compatible embedding endpoint via `base_url` + `api_key`, or loads a local model with `SentenceTransformer` when `base_url="local"`.
+> - **`FastEmbedder`:** local, API-key-free embedder backed by the `fastembed` library, used as a fallback when no API key is configured (default model: `BAAI/bge-small-en-v1.5`).
+>
+> **Configuration / Environment:**
+>
+> - `EMBEDDING_MODEL`: the embedding model name (e.g. `bge-m3`, `text-embedding-3-small`, ...)
+> - `EMBEDDING_BASE_URL`: the endpoint of the OpenAI-compatible embedding server, or the reserved value `local`
+> - `EMBEDDING_API_KEY`: the API key used for authentication (optional when using `local` or `FastEmbedder`)
+> - `VECTOR_DIM`: must match the output dimension of the chosen model
+>
+> **Process:**
+>
+> 1. Receive chunk objects from the Chunking stage.
+> 2. Collect the `text` of each chunk into a list.
+> 3. Embed the texts through `_batch_embed()` (a true batch call when the underlying client supports it).
+> 4. Attach each produced vector to its chunk under the key `vector`.
+> 5. Expose `embed_query()` to embed the user query separately, since some models use different instructions for queries vs documents.
+> 6. Expose `get_vectorspace_dimensions` so the Vector Store can create a collection with the correct `VECTOR_DIM`.
+>
+> **Output:**
+>
+> - **Datatype:** `List[Dict]` *(the input chunks mutated with their vectors)*
+> - **Output Scheme:**
+>
+> ```json
+> {
+>   "text": "chunk text",
+>   "metadata": {
+>     "source": "file.pdf",
+>     "file_path": "/data/file.pdf",
+>     "file_type": "pdf",
+>     "chunk_index": 0,
+>     "total_chunk": 10
+>   },
+>   "vector": [0.0123, -0.0456, 0.0789, "..."]
+> }
+> ```
+
+**Embedder Architecture**
+Both embedders inherit from the abstract `BaseEmbedder` interface, so the embedding backend can be swapped without touching the rest of the RAG pipeline.
+
+```mermaid
+flowchart LR
+    C["Chunking Stage<br/><br/>text + metadata"]
+        --> B["BaseEmbedder<br/><br/>
+            embed_one()<br/>
+            embed_many()<br/>
+            embed_query()<br/>
+            get_vectorspace_dimensions"]
+
+    B --> M["ModelEmbedder<br/><br/>remote (OpenAI-compatible)<br/>or local SentenceTransformer"]
+    B --> F["FastEmbedder<br/><br/>fastembed (local, no API key)"]
+
+    M --> E["Vector Embedding"]
+    F --> E
+```
+
+**Workflows:**
+
+```python
+from src.embeddings import FastEmbedder, ModelEmbedder
+
+# 1. Fast-Embedder -> local, no api_key / base_url needed
+fast_embedder = FastEmbedder(model="BAAI/bge-small-en-v1.5")
+
+dim = fast_embedder.get_vectorspace_dimensions
+
+
+# 2. Model-Embedder -> remote endpoint
+model_embedder = ModelEmbedder(
+    model="bge-m3",
+    base_url="http://localhost:6333",  # or your embedding server URL
+    api_key="your-api-key",
+)
+
+# 3. Model-Embedder -> local model for developing purpose
+local_embedder = ModelEmbedder(
+    model="BAAI/bge-small-en-v1.5",
+    base_url="local",
+)
+
+# Embed a batch of chunks (adds "vector" to each chunk dict)
+chunks = [{"text": "The cell membrane is selectively permeable.", "metadata": {}}]
+embedded_chunks = model_embedder.embed_many(chunks)
+
+# Embed a single user query for searching
+query_vector = model_embedder.embed_query("What is the cell membrane?")
+```
+
+
+
+
 # References
 
 ## [1] MarkItDown — Repo

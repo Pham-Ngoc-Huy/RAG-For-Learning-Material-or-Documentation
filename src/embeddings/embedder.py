@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 
 import openai
 from sentence_transformers import SentenceTransformer
+from fastembed import TextEmbedding
 
 
 class BaseEmbedder(ABC):
@@ -99,8 +100,6 @@ class FastEmbedder(BaseEmbedder):
     """
 
     def __init__(self, model: str = "BAAI/bge-small-en-v1.5"):
-        from fastembed import TextEmbedding
-
         self.model = model
         self._dimensions = None
         self.client = TextEmbedding(model_name=self.model)
