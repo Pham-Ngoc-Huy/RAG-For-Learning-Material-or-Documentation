@@ -23,8 +23,16 @@ Instead of asking an `LLM` from memory, you first fetch `relevant chunks` from y
 
 ## 3. Data Flow:
 
-```
-Documents has transformed to `.md` → [ingestion] → [chunking] → [embeddings] → [vectordb]                                                      ↓
-User question → [embeddings] → [retrieval] → [prompts] → [llm] → answer
-
+```mermaid
+flowchart TD
+A[loader] --> B[ingestion]
+B --> C[chunking]
+C --> D[embeddings]
+D --> E[vectordb]
+E --> H
+F[User question] --> G[embeddings]
+G --> H[retrieval]
+H --> I[prompts]
+I --> J[llm]
+J --> K[answer]
 ```

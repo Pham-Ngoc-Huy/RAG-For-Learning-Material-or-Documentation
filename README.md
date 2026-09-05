@@ -382,6 +382,260 @@ embedded_chunks = model_embedder.embed_many(chunks)
 query_vector = model_embedder.embed_query("What is the cell membrane?")
 ```
 
+### 2.5. Retrieval
+
+**Description:**
+
+> The **Retrieval** stage turns the user's natural-language query into a vector, searches the tenant-aware vector store for the most similar chunks, and returns the top-`k` results as context for the Generation stage.
+>
+> In this project, **Qdrant** is used as the vector database through a provider-independent `BaseRetriever` interface and a `QdrantRetriever` implementation. All searches are scoped to a `user_id` to enforce tenant isolation.
+
+> [!NOTE] > **Retriever**
+>
+> **File destination:**
+>
+> - `/src/retrieval/retriever.py`
+>
+> **Input:**
+>
+> - `user_id`: tenant identifier used for isolation
+> - `query`: the user query string to embed and search
+> - `top_k`: number of top documents to return (default: `5`)
+> - `metadata_filter`: optional additional Qdrant metadata filter (e.g. filter by `file_path`)
+> - `collection_name`: optional alternate collection name suffix
+>
+> **Process:**
+>
+> 1. Receive the user's `query` and `user_id`.
+> 2. Embed the query into a vector using `embedder.embed_query()`.
+> 3. Search the vector store for the `top_k` nearest vectors within the user's tenant collection.
+> 4. Apply the optional `metadata_filter` (e.g. restrict results to a specific document).
+> 5. Return the retrieved chunks together with their payload and similarity score.
+>
+> **Output:**
+>
+> - **Datatype:** `List[Dict]`
+> - **Output Scheme:**
+>
+> ```json
+> {
+>   "id": "doc1-chunk-0",
+>   "score": 0.9234,
+>   "payload": {
+>     "text": "chunk text",
+>     "source": "file.pdf",
+>     "file_path": "/data/file.pdf",
+>     "file_type": "pdf",
+>     "chunk_index": 0,
+>     "total_chunk": 10,
+>     "loaded_at": "2026-08-03T10:00:00",
+>     "user_id": "student_001"
+>   }
+> }
+> ```
+
+**Retriever Architecture**
+The retriever is built on an abstract interface so the underlying vector database can be replaced without changing the retrieval logic.
+
+```mermaid
+flowchart LR
+    Q["User Query"]
+        --> E["Embedder<br/><br/>embed_query()</br>→ query vector"]
+
+    E --> B["BaseRetriever<br/><br/>retrieve()"]
+
+    B --> QR["QdrantRetriever<br/><br/>Qdrant search<br/>+ tenant isolation"]
+
+    QR --> R["Retrieved Chunks<br/><br/>top_k results"]
+```
+
+**Workflows:**
+
+```python
+from src.retrieval import QdrantRetriever
+from qdrant_client.models import Filter, FieldCondition, MatchValue
+
+retriever = QdrantRetriever(
+    vector_store=vector_store,
+    embedder=embedder,
+)
+
+# Simple retrieval
+results = retriever.retrieve(
+    user_id="student_001",
+    query="What is the cell membrane?",
+    top_k=5,
+)
+
+# Retrieval with a metadata filter (e.g. only from one document)
+query_filter = Filter(
+    must=[
+        FieldCondition(key="file_path", match=MatchValue(value="/data/biology.pdf")),
+    ]
+)
+results = retriever.retrieve(
+    user_id="student_001",
+    query="What is the cell membrane?",
+    top_k=5,
+    metadata_filter=query_filter,
+)
+```
+
+### 2.6. Prompt (Prompt Builder)
+
+**Description:**
+
+> The **Prompt Builder** constructs the final prompt that is sent to the LLM. It loads a prompt template (as a `.yml` file), injects the retrieved chunks as context and the user's query, then formats it into the chat message structure (`system` + `user`).
+>
+> In this project, `PromptTemplate` is an abstract interface and `PromptAssistance` is the concrete implementation that reads templates from `src/prompts/`.
+
+> [!NOTE] > **Prompt Builder**
+>
+> **File destination:**
+>
+> - `/src/prompts/prompt_templates.py` (implementation)
+> - `/src/prompts/*.yml` (templates, e.g. `rag_assistance.yml`, `extractor.yml`)
+>
+> **Input:**
+>
+> - `template_name`: name of the YAML template to load (without the `.yml` extension)
+> - `**kwargs`: template variables used for formatting, such as `context` and `query`
+>
+> **Template structure (`.yml`):**
+>
+> - `system_message`: the system prompt; may contain placeholders like `{context}` (formatted if possible, skipped otherwise)
+> - `user_message_template`: the user prompt; `{context}` and `{query}` are injected here
+>
+> **Process:**
+>
+> 1. Load the YAML template via a config loader (`NormalLoader`).
+> 2. Format the `system_message` with the provided `kwargs` (ignores missing keys).
+> 3. Format the `user_message_template` with the provided `kwargs` (raises `ValueError` if a parameter is missing).
+> 4. Return the list of messages in chat format.
+>
+> **Output:**
+>
+> - **Datatype:** `List[Dict[str, str]]`
+> - **Output Scheme:**
+>
+> ```json
+> [
+>   {
+>     "role": "system",
+>     "content": "You are an AI assistant whose task is to answer questions based on the provided context. ..."
+>   },
+>   {
+>     "role": "user",
+>     "content": "[PROVIDED CONTEXT]\n{context}\n\n[USER QUESTION]\n{query}"
+>   }
+> ]
+> ```
+
+**Workflows:**
+
+```python
+from src.prompts import PromptAssistance
+
+prompt_builder = PromptAssistance(prompts_dir="src/prompts")
+
+messages = prompt_builder.build(
+    template_name="rag_assistance",
+    context=retrieved_chunks_text,
+    query="What is the cell membrane?",
+)
+```
+
+### 2.7. LLM (LLM Client)
+
+**Description:**
+
+> The **LLM Client** sends the formatted prompt (or message history) to a large language model and returns the generated answer. It is built on an abstract `BaseLLMClient` interface so different providers (OpenAI, Google, OpenRouter-style APIs, ...) can be plugged in without changing the RAG pipeline.
+>
+> In this project, `ThinkingFromKnowledgeBase` is the concrete implementation that calls any OpenAI-compatible chat-completions endpoint.
+
+> [!NOTE] > **LLM Client**
+>
+> **File destination:**
+>
+> - `/src/llm/llm_client.py`
+>
+> **Input:**
+>
+> - `prompt`: the formatted prompt text (usually produced by the Prompt Builder)
+> - `messages`: optional chat message history for OpenRouter-style APIs (used instead of `prompt` if provided)
+> - `temperature`: sampling temperature, `0.0` = deterministic, `1.0` = creative (default: `0.7`)
+>
+> **Configuration / Environment:**
+>
+> - `LLM_API_KEY`: API key used for authentication (required by `ThinkingFromKnowledgeBase`)
+> - `LLM_BASE_URL`: base URL of the chat-completions endpoint
+> - `LLM_MODEL`: model name to call, e.g. `gpt-4o`, `gemini-2.0-flash`, ...
+> - `LLM_PROVIDER`: provider label stored in the response, e.g. `openai`, `google`, `openrouter`
+>
+> **Process:**
+>
+> 1. Receive a formatted `prompt` or a `messages` history.
+> 2. Build the payload messages (`messages` if given, otherwise a single user message from `prompt`).
+> 3. Call `client.chat.completions.create()` with the configured model and temperature.
+> 4. Wrap the answer into an `LLMResponse` dataclass.
+> 5. On failure, return an `LLMResponse` containing the error message instead of raising.
+>
+> **Output:**
+>
+> - **Datatype:** `LLMResponse` *(dataclass)*
+> - **Output Scheme:**
+>
+> ```json
+> {
+>   "text": "the generated answer",
+>   "provider": "openai",
+>   "model": "gpt-4o",
+>   "response": {
+>     "id": "chatcmpl-...",
+>     "...": "raw API response"
+>   }
+> }
+> ```
+
+**LLM Client Architecture**
+
+```mermaid
+flowchart LR
+    PB["Prompt Builder<br/><br/>system + user messages"]
+        --> B["BaseLLMClient<br/><br/>generate()"]
+
+    B --> T["ThinkingFromKnowledgeBase<br/><br/>OpenAI-compatible API"]
+
+    T --> L["LLM Response<br/><br/>LLMResponse dataclass"]
+```
+
+**Workflows:**
+
+```python
+from src.llm import ThinkingFromKnowledgeBase
+from src.prompts import PromptAssistance
+
+llm_client = ThinkingFromKnowledgeBase(
+    api_key="your-api-key",
+    base_url="https://api.openai.com/v1",
+    model="gpt-4o",
+    provider="openai",
+)
+
+# 1. Generate from a formatted prompt
+prompt_builder = PromptAssistance(prompts_dir="src/prompts")
+messages = prompt_builder.build(
+    template_name="rag_assistance",
+    context=retrieved_chunks_text,
+    query="What is the cell membrane?",
+)
+
+answer = llm_client.generate(messages=messages)
+
+# 2. Generate from a simple prompt string
+answer = llm_client.generate(prompt="What is the cell membrane?")
+print(answer.text)
+```
 
 
 
