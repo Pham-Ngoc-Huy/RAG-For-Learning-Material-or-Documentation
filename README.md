@@ -271,12 +271,11 @@ We have 2 type of processing:
 
 > [!NOTE]:
 >
-> It just different in model usage only 
+> It just different in model usage only
 >
 > - With Fast-Embedder -> we do not need to import model/api_key/url
->
 > - With Model-Embedder -> we must include all the model/api_key/url -> for authentication
-> 
+>
 > The processing in general is the same
 
 > [!NOTE] > **Embedder**
@@ -314,7 +313,7 @@ We have 2 type of processing:
 >
 > **Output:**
 >
-> - **Datatype:** `List[Dict]` *(the input chunks mutated with their vectors)*
+> - **Datatype:** `List[Dict]` _(the input chunks mutated with their vectors)_
 > - **Output Scheme:**
 >
 > ```json
@@ -582,7 +581,7 @@ messages = prompt_builder.build(
 >
 > **Output:**
 >
-> - **Datatype:** `LLMResponse` *(dataclass)*
+> - **Datatype:** `LLMResponse` _(dataclass)_
 > - **Output Scheme:**
 >
 > ```json
@@ -636,8 +635,6 @@ answer = llm_client.generate(messages=messages)
 answer = llm_client.generate(prompt="What is the cell membrane?")
 print(answer.text)
 ```
-
-
 
 # References
 

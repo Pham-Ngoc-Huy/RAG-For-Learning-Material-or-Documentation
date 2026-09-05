@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 
 import openai
-from sentence_transformers import SentenceTransformer
 from fastembed import TextEmbedding
+from sentence_transformers import SentenceTransformer
 
 
 class BaseEmbedder(ABC):
