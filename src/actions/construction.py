@@ -1,5 +1,5 @@
-import os
 from abc import ABC, abstractmethod
+
 from src.embeddings import FastEmbedder, ModelEmbedder
 from src.llm import ThinkingFromKnowledgeBase
 from src.prompts import PromptAssistance

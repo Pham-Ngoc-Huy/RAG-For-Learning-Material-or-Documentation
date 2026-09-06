@@ -8,7 +8,10 @@ export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [user, setUser] = useState<{ user_id: string; username: string } | null>(null);
+  const [user, setUser] = useState<{
+    user_id: string;
+    username: string;
+  } | null>(null);
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -17,7 +20,9 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const result =
-        mode === "login" ? await login(username, password) : await signup(username, password);
+        mode === "login"
+          ? await login(username, password)
+          : await signup(username, password);
       setUser(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
@@ -96,7 +101,11 @@ export default function LoginPage() {
             disabled={loading}
             className="mt-2 rounded-full bg-zinc-900 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-300"
           >
-            {loading ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"}
+            {loading
+              ? "Please wait…"
+              : mode === "login"
+                ? "Sign in"
+                : "Create account"}
           </button>
         </form>
 
@@ -107,7 +116,9 @@ export default function LoginPage() {
           }}
           className="mt-4 w-full text-center text-sm text-zinc-500 underline-offset-4 hover:underline dark:text-zinc-400"
         >
-          {mode === "login" ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
+          {mode === "login"
+            ? "Don't have an account? Sign up"
+            : "Already have an account? Sign in"}
         </button>
       </div>
     </div>

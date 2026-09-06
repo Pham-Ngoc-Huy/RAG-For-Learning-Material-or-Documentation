@@ -23,14 +23,20 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return data;
 }
 
-export function login(username: string, password: string): Promise<AuthResponse> {
+export function login(
+  username: string,
+  password: string,
+): Promise<AuthResponse> {
   return request<AuthResponse>("/api/auth/login", {
     method: "POST",
     body: JSON.stringify({ username, password }),
   });
 }
 
-export function signup(username: string, password: string): Promise<AuthResponse> {
+export function signup(
+  username: string,
+  password: string,
+): Promise<AuthResponse> {
   return request<AuthResponse>("/api/auth/signup", {
     method: "POST",
     body: JSON.stringify({ username, password }),

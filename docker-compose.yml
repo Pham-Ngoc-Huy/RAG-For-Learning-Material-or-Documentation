@@ -31,7 +31,7 @@ services:
       dockerfile: Dockerfile.frontend
     ports:
       - "3000:3000"
-      
+
 configs:
   qdrant_config:
     content: |

@@ -1,9 +1,4 @@
-from .construction import (
-    ConstructorLoops,
-    AskAndAnswer,
-    QdrantCollection,
-    Embedded
-)
+from .construction import AskAndAnswer, ConstructorLoops, Embedded, QdrantCollection
 
 __all__ = [
     "ConstructorLoops",
