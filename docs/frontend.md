@@ -1,4 +1,5 @@
 # FrontEnd
+
 > This project will use ReactJS (Next.js) as the FrontEnd
 
 ## 1. How to set up
@@ -80,11 +81,11 @@ The CORS allow-list on the backend (`app.py`) is configured to accept
 
 ### Available endpoints
 
-| Method | Endpoint            | Purpose                          |
-| ------ | ------------------- | -------------------------------- |
-| POST   | `/api/auth/signup`  | Create a new user account        |
-| POST   | `/api/auth/login`   | Authenticate an existing user    |
-| POST   | `/api/uploader/upload` | Upload a document            |
+| Method | Endpoint               | Purpose                       |
+| ------ | ---------------------- | ----------------------------- |
+| POST   | `/api/auth/signup`     | Create a new user account     |
+| POST   | `/api/auth/login`      | Authenticate an existing user |
+| POST   | `/api/uploader/upload` | Upload a document             |
 
 Both auth endpoints accept `{ "username": string, "password": string }`
 (password max length `72`) and return `{ "user_id": string, "username": string }`.
