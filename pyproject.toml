@@ -1,7 +1,7 @@
 [project]
 name = "rag-for-learning-material-or-documentation"
 version = "0.1.0"
-description = "Add your description here"
+description = "This project mainly is about how we can framework for the prompt and system while the A.I chatbot can be more efficiency in query and answer"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
