@@ -21,16 +21,17 @@ services:
   backend:
     build:
       context: .
-      dockerfile: backend/Dockerfile
+      dockerfile: Dockerfile.backend
     ports:
       - "8000:8000"
 
   frontend:
     build:
-      context: .
-      dockerfile: frontend/Dockerfile
+      context: ./rag-vgu
+      dockerfile: Dockerfile.frontend
     ports:
       - "3000:3000"
+      
 configs:
   qdrant_config:
     content: |
