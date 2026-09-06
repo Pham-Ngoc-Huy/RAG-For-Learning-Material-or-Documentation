@@ -4,7 +4,7 @@ from src.api.schemas.auth import LoginRequest, LoginResponse, SignUpRequest, Sig
 from src.api.services import AuthServiceImpl
 
 router = APIRouter(
-    prefix="/auth",
+    prefix="/api/auth",
     tags=["Authentication"],
 )
 

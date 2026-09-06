@@ -1,8 +1,17 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
   "builds": [
-    { "src": "api/index.py", "use": "@vercel/python" },
-    { "src": "static/**/*", "use": "@vercel/static" }
+    { "src": "rag-vgu/package.json", "use": "@vercel/next" },
+    { "src": "api/index.py", "use": "@vercel/python" }
   ],
-  "routes": [{ "src": "/(.*)", "dest": "api/index.py" }]
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/index.py" },
+    { "src": "/api", "dest": "/api/index.py" }
+  ],
+  "functions": {
+    "api/index.py": {
+      "maxDuration": 60
+    }
+  }
 }

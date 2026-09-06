@@ -18,6 +18,19 @@ services:
     environment:
       QDRANT__SERVICE__API_KEY: "admin123"
 
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "3000:3000"
 configs:
   qdrant_config:
     content: |

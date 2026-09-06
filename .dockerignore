@@ -9,3 +9,16 @@ __pycache__/
 .gitignore
 logs/
 .env
+.venv/
+venv/
+node_modules/
+rag-vgu/
+frontend/
+backend/Dockerfile
+.next/
+md_store/
+temp/
+.pytest_cache/
+.ruff_cache/
+__pycache__
+.DS_Store

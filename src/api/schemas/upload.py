@@ -1,11 +1,21 @@
 from datetime import datetime
 
-from fastapi import BaseModel
+from pydantic import BaseModel
 
 
 class UploadFileSchema(BaseModel):
-    file: bytes
-    username: str
-    filename: str
-    content: str
+    user_id: str
+    user_name: str
+    collection_name: str
+    file_path: str
+    model: str
+
+
+class UploadFileResponse(BaseModel):
+    user_id: str
+    user_name: str
+    collection_name: str
+    file_path: str
+    model: str
+    total_chunks: int
     upload_date: datetime
