@@ -131,6 +131,7 @@ class QdrantVectorStore(BaseVectorStore):
         self,
         user_id: str,
         metadata_filter: Optional[Filter] = None,
+        **kwargs
     ) -> Filter:
         """
         @brief Build a Qdrant filter enforcing tenant isolation.
@@ -140,28 +141,47 @@ class QdrantVectorStore(BaseVectorStore):
         @update date 2026-08-03
         @commented by Huy Pham
         """
-        conditions = [
+
+        source = kwargs.get("source")
+        file_path = kwargs.get("file_path")
+
+        base_must_conditions = [
             FieldCondition(
                 key="user_id", 
                 match=MatchValue(value=user_id)
             )
+            
         ]
 
-        if metadata_filter is None:
-            return Filter(must=conditions)
+        if source is not None:
 
-        must_conditions = []
-        if metadata_filter.must:
-            must_conditions.extend(metadata_filter.must)
-        if metadata_filter.should:
-            return Filter(
-                must=conditions + must_conditions,
-                should=metadata_filter.should,
-                must_not=metadata_filter.must_not,
+            base_must_conditions.append(
+                FieldCondition(
+                    key="source",
+                    match=MatchValue(value=source)
+                )
             )
 
+        if file_path is not None:
+            base_must_conditions.append(
+                FieldCondition(
+                    key="file_path",
+                    match=MatchValue(value=file_path)
+                )
+            )
+
+        if metadata_filter is None:
+            return Filter(must=base_must_conditions)
+
+        merged_must = list(base_must_conditions)
+        
+        if metadata_filter.must:
+            merged_must.extend(metadata_filter.must)
+
+
         return Filter(
-            must=conditions + must_conditions,
+            must=merged_must,
+            should=metadata_filter.should,
             must_not=metadata_filter.must_not,
         )
 
@@ -180,23 +200,27 @@ class QdrantVectorStore(BaseVectorStore):
         @update date 2026-08-03
         @commented by Huy Pham
         """
-        collection = collection_name
         vectors_config = VectorParams(size=vector_size, distance=distance)
+
         try:
-            self.client.get_collection(collection_name=collection)
-            return collection
+            self.client.get_collection(collection_name=collection_name)
+            return collection_name
+        
         except Exception:
-            self.client.create_collection(collection_name=collection, vectors_config=vectors_config)
+            self.client.create_collection(collection_name=collection_name, vectors_config=vectors_config)
             # Create payload index for user_id filtering
+        
             try:
                 self.client.create_payload_index(
-                    collection_name=collection,
+                    collection_name=collection_name,
                     field_name="user_id",
                     field_schema="keyword",
                 )
+        
             except Exception:
                 pass  # Index might already exist
-            return collection
+        
+            return collection_name
 
     def upsert(
         self,
@@ -204,12 +228,12 @@ class QdrantVectorStore(BaseVectorStore):
         chunks: list[dict],
         collection_name: Optional[str] = None,
     ) -> list[str]:
+
         if not chunks:
             return []
 
-        collection = collection_name
         try:
-            self.client.get_collection(collection_name=collection)
+            self.client.get_collection(collection_name=collection_name)
         except Exception:
             self.create_collection(
                 vector_size=len(chunks[0]["vector"]),
@@ -233,7 +257,7 @@ class QdrantVectorStore(BaseVectorStore):
                 )
             )
 
-        self.client.upsert(collection_name=collection, points=points)
+        self.client.upsert(collection_name=collection_name, points=points)
         return [point.id for point in points]
 
     def search(
@@ -247,9 +271,13 @@ class QdrantVectorStore(BaseVectorStore):
     ) -> list[dict]:
 
         if user_id is not None:
-            query_filter = self._build_user_filter(user_id=user_id, metadata_filter=metadata_filter)
+            query_filter = self._build_user_filter(
+                user_id=user_id, 
+                metadata_filter=metadata_filter
+            )
         else: 
             query_filter = None
+
         results = self.client.query_points(
             collection_name=collection_name,
             query=query_vector,
@@ -271,20 +299,25 @@ class QdrantVectorStore(BaseVectorStore):
         self,
         user_id: str,
         collection_name: Optional[str] = None,
+        **kwargs
     ) -> None:
-        collection = self._collection_name(user_id, collection_name)
-        query_filter = self._build_user_filter(user_id=user_id)
-        self.client.delete(collection_name=collection, filter=query_filter)
+        
+        query_filter = self._build_user_filter(
+            user_id=user_id,
+            **kwargs
+        )
+
+        return self.client.delete(collection_name=collection_name, filter=query_filter)
 
     def delete_collection(
         self,
-        user_id: str,
         collection_name: Optional[str] = None,
     ) -> None:
-        collection = self._collection_name(user_id, collection_name)
+
         try:
-            self.client.get_collection(collection_name=collection)
+            self.client.get_collection(collection_name=collection_name)
         except Exception:
             # Collection doesn't exist yet, nothing to delete.
             return
-        self.client.delete_collection(collection_name=collection)
+
+        return self.client.delete_collection(collection_name=collection_name)

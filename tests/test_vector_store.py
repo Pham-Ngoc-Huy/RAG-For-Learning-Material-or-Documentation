@@ -2,7 +2,13 @@ from types import SimpleNamespace
 
 from src.vectordb.vector_store import Distance, QdrantVectorStore
 
-
+# test cases for vector store
+# -- create collection
+# -- upsert
+# -- delete
+# ---- delete collection
+# ---- delete user input
+# -- searching
 class DummyQdrantClient:
     def __init__(self, **kwargs):
         self.kwargs = kwargs
@@ -12,12 +18,19 @@ class DummyQdrantClient:
         self.deleted = []
         self.existing_collections = set()
 
-    def get_collection(self, collection_name):
+    def get_collection(
+        self, 
+        collection_name: str
+    ):
         if collection_name not in self.existing_collections:
             raise ValueError("Collection not found")
         return SimpleNamespace(name=collection_name)
 
-    def create_collection(self, collection_name, vectors_config):
+    def create_collection(
+        self, 
+        collection_name: str, 
+        vectors_config
+    ):
         self.created_collections.append((collection_name, vectors_config))
         self.existing_collections.add(collection_name)
 
