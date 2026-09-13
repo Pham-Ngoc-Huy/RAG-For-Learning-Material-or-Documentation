@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 
 from src.actions.construction import AskAndAnswer
 
+
 class ChatService(ABC):
     @abstractmethod
     async def chat(

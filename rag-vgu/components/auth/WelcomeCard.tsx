@@ -11,7 +11,10 @@ type WelcomeCardProps = {
 
 export default function WelcomeCard({ user, onLogout }: WelcomeCardProps) {
   return (
-    <AuthCard title={`Welcome, ${user.username}`} subtitle={`User ID: ${user.user_id}`}>
+    <AuthCard
+      title={`Welcome, ${user.username}`}
+      subtitle={`User ID: ${user.user_id}`}
+    >
       <div className="flex flex-col gap-2">
         <Link
           href="/chat"
