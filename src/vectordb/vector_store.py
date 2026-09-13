@@ -17,7 +17,6 @@ class BaseVectorStore(ABC):
     @abstractmethod
     def create_collection(
         self,
-        user_id: str,
         vector_size: int,
         distance: Distance = Distance.COSINE,
         collection_name: Optional[str] = None,
@@ -55,9 +54,9 @@ class BaseVectorStore(ABC):
     @abstractmethod
     def search(
         self,
-        user_id: str,
         query_vector: list[float],
         top_k: int = 5,
+        user_id: str = None,
         collection_name: Optional[str] = None,
         metadata_filter: Optional[Filter] = None,
         with_payload: bool = True,
@@ -81,6 +80,7 @@ class BaseVectorStore(ABC):
         self,
         user_id: str,
         collection_name: Optional[str] = None,
+        metadata_filter: Optional[Filter] = None
     ) -> None:
         """
         @brief Delete all vectors belonging to one tenant in a collection.
@@ -95,12 +95,10 @@ class BaseVectorStore(ABC):
     @abstractmethod
     def delete_collection(
         self,
-        user_id: str,
         collection_name: Optional[str] = None,
     ) -> None:
         """
         @brief Remove a tenant-specific Qdrant collection entirely.
-        @param user_id: tenant identifier for multi-tenant isolation
         @param collection_name: optional custom collection suffix
         @objective Delete the tenant collection safely.
         @update date 2026-08-03
@@ -129,22 +127,6 @@ class QdrantVectorStore(BaseVectorStore):
         self.api_key = api_key
         self.client = QdrantClient(url=self.endpoint, api_key=self.api_key, prefer_grpc=prefer_grpc)
 
-    def _collection_name(self, user_id: str, collection_name: Optional[str] = None) -> str:
-        """
-        @brief Compute a tenant-isolated collection name.
-        @param user_id: tenant identifier
-        @param collection_name: optional suffix for the collection
-        @objective Keep tenant collections separate by naming convention.
-        @update date 2026-08-03
-        @commented by Huy Pham
-        """
-        if not user_id or not str(user_id).strip():
-            raise ValueError("user_id must be provided")
-
-        safe_user_id = str(user_id).strip().replace(" ", "_")
-        suffix = collection_name
-        return f"user_{safe_user_id}_{suffix}"
-
     def _build_user_filter(
         self,
         user_id: str,
@@ -158,7 +140,12 @@ class QdrantVectorStore(BaseVectorStore):
         @update date 2026-08-03
         @commented by Huy Pham
         """
-        conditions = [FieldCondition(key="user_id", match=MatchValue(value=user_id))]
+        conditions = [
+            FieldCondition(
+                key="user_id", 
+                match=MatchValue(value=user_id)
+            )
+        ]
 
         if metadata_filter is None:
             return Filter(must=conditions)
@@ -180,14 +167,12 @@ class QdrantVectorStore(BaseVectorStore):
 
     def create_collection(
         self,
-        user_id: str,
         vector_size: int,
         distance: Distance = Distance.COSINE,
         collection_name: Optional[str] = None,
     ) -> str:
         """
         @brief Create a tenant-scoped vector collection if it does not exist.
-        @param user_id: tenant identifier for multi-tenant isolation
         @param vector_size: size of each vector in the collection
         @param distance: qdrant distance metric for similarity search
         @param collection_name: optional custom collection suffix
@@ -195,7 +180,7 @@ class QdrantVectorStore(BaseVectorStore):
         @update date 2026-08-03
         @commented by Huy Pham
         """
-        collection = self._collection_name(user_id, collection_name)
+        collection = collection_name
         vectors_config = VectorParams(size=vector_size, distance=distance)
         try:
             self.client.get_collection(collection_name=collection)
@@ -222,12 +207,11 @@ class QdrantVectorStore(BaseVectorStore):
         if not chunks:
             return []
 
-        collection = self._collection_name(user_id, collection_name)
+        collection = collection_name
         try:
             self.client.get_collection(collection_name=collection)
         except Exception:
             self.create_collection(
-                user_id=user_id,
                 vector_size=len(chunks[0]["vector"]),
                 collection_name=collection_name,
             )
@@ -254,24 +238,26 @@ class QdrantVectorStore(BaseVectorStore):
 
     def search(
         self,
-        user_id: str,
         query_vector: list[float],
         top_k: int = 5,
+        user_id: str = None,
         collection_name: Optional[str] = None,
         metadata_filter: Optional[Filter] = None,
         with_payload: bool = True,
     ) -> list[dict]:
-        collection = self._collection_name(user_id, collection_name)
-        query_filter = self._build_user_filter(user_id=user_id, metadata_filter=metadata_filter)
 
+        if user_id is not None:
+            query_filter = self._build_user_filter(user_id=user_id, metadata_filter=metadata_filter)
+        else: 
+            query_filter = None
         results = self.client.query_points(
-            collection_name=collection,
+            collection_name=collection_name,
             query=query_vector,
             limit=top_k,
             query_filter=query_filter,
             with_payload=with_payload,
         )
-
+        
         return [
             {
                 "id": getattr(hit, "id", None),

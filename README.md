@@ -78,6 +78,8 @@ flowchart TD
 > {
 >   "text": text,
 >   "metadata": {
+>     "user_id": user_id,
+>     "tenant": tenant,
 >     "source": source,
 >     "file_path": file_path,
 >     "file_type": file_type,
@@ -155,6 +157,8 @@ Chunk 3:
 > {
 >   "text": text,
 >   "metadata": {
+>     "user_id": user_id,
+>     "tenant": tenant,
 >     "source": source,
 >     "file_path": file_path,
 >     "file_type": file_type,
