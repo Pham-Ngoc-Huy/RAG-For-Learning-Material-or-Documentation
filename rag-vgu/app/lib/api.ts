@@ -42,3 +42,27 @@ export function signup(
     body: JSON.stringify({ username, password }),
   });
 }
+
+export type ChatSession = {
+  user_id: string;
+  user_name: string;
+  collection_name: string;
+  model: string;
+};
+
+export type ChatQuestion = ChatSession & { question: string };
+
+export type ChatResponse = {
+  user_id: string;
+  user_name: string;
+  collection_name: string;
+  question: string;
+  answer: string;
+};
+
+export function chatQuestion(question: ChatQuestion): Promise<ChatResponse> {
+  return request<ChatResponse>("/api/chat/query", {
+    method: "POST",
+    body: JSON.stringify(question),
+  });
+}

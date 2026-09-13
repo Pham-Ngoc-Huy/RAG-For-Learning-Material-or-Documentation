@@ -5,6 +5,9 @@ __pycache__/
 *.db
 *.sqlite3
 .vscode/
+*.pyc
+.pytest_cache/
+*_cache/
 .git/
 .gitignore
 logs/

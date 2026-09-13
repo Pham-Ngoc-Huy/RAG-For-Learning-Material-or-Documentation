@@ -5,11 +5,13 @@ WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-RUN pip install --no-cache-dir uv
+RUN --mount=type=cache,target=/root/.cache/pip pip install uv
+
+ENV UV_LINK_MODE=copy
 
 COPY pyproject.toml uv.lock README.md ./
 
-RUN uv sync --frozen
+RUN --mount=type=cache,target=/root/.cache/uv uv sync --frozen --no-editable -v
 
 COPY . .
 

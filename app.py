@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.api.routes.auth import router as auth_router
+from src.api.routes.chat import router as chat_router
 from src.api.routes.upload import router as upload_router
 
 app = FastAPI()
@@ -25,3 +26,6 @@ app.include_router(auth_router)
 
 # using for uploading documents
 app.include_router(upload_router)
+
+# using for chatting with documents
+app.include_router(chat_router)

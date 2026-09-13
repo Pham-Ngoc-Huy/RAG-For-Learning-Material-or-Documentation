@@ -55,3 +55,15 @@ packages = ["src"]
 lint.select = ["E", "F", "I"] # Enable pycodestyle (`E`), Pyflakes (`F`) and Isort(`I`) codes.
 lint.ignore = ["E501", "F403"]
 line-length = 125
+
+# Khai báo nguồn tải PyTorch bản CPU
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+# Ép uv phải lấy các thư viện này từ nguồn CPU ở trên
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+torchvision = { index = "pytorch-cpu" }
+torchaudio = { index = "pytorch-cpu" }
